@@ -1,6 +1,7 @@
 const crypto = require('node:crypto');
 const { db, genId } = require('./db');
 const { normalizeText, tokenize, searchKnowledge, matchFaq } = require('./rag');
+const { generateWithProvider } = require('./llm');
 
 const INJECTION_PATTERNS = [
   /ignore\s+(all\s+)?(previous|prior|above)\s+instructions/i,
@@ -356,8 +357,28 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
     }
   }
 
-  const answer = parts.join('\n');
-  const tokensUsed = Math.max(18, Math.ceil((cleanQuery.length + answer.length) / 4));
+  let answer = parts.join('\n');
+  let tokensUsed = Math.max(18, Math.ceil((cleanQuery.length + answer.length) / 4));
+  let finalModelUsed = modelUsed;
+
+  if (site.llm_provider && site.llm_provider !== 'local') {
+    try {
+      const llmRes = await generateWithProvider({
+        site,
+        query: cleanQuery,
+        contextText: answer,
+        lang,
+        isComplex: complexityScore >= 3,
+      });
+      if (llmRes && llmRes.text) {
+        answer = llmRes.text;
+        tokensUsed = llmRes.tokensUsed;
+        finalModelUsed = llmRes.modelUsed;
+      }
+    } catch (_err) {
+      // Safe fallback to deterministic grounded response if external LLM fails
+    }
+  }
 
   db.prepare('UPDATE sites SET tokens_used = tokens_used + ? WHERE id = ?').run(tokensUsed, site.id);
 
@@ -372,7 +393,7 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
 
   saveMessage(dialog.id, site.id, 'assistant', answer, {
     sources,
-    model_used: modelUsed,
+    model_used: finalModelUsed,
     cache_hit: false,
     tokens_used: tokensUsed,
   });
@@ -381,7 +402,7 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
     dialog_id: dialog.id,
     answer,
     sources,
-    model_used: modelUsed,
+    model_used: finalModelUsed,
     cache_hit: false,
     tokens_used: tokensUsed,
     needs_human: false,

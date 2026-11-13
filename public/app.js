@@ -75,6 +75,10 @@ async function refreshCurrentSite() {
   $('cfgLang').value = site.language || 'ru';
   $('cfgPrompt').value = site.system_prompt || '';
   $('cfgStrict').checked = Boolean(site.strict_mode);
+  $('cfgLlmProvider').value = site.llm_provider || 'local';
+  $('cfgLlmModel').value = site.llm_model || '';
+  $('cfgLlmKey').value = '';
+  $('cfgLlmKey').placeholder = site.has_llm_api_key ? 'Ключ сохранён (введите для замены)' : 'API-ключ (опционально)';
 
   $('priceApiUrlInput').value = site.price_api_url || '';
   $('simulateOfflineToggle').checked = Boolean(site.price_api_offline);
@@ -211,6 +215,9 @@ $('siteSettingsForm').addEventListener('submit', async (e) => {
       language: $('cfgLang').value,
       system_prompt: $('cfgPrompt').value,
       strict_mode: $('cfgStrict').checked,
+      llm_provider: $('cfgLlmProvider').value,
+      llm_model: $('cfgLlmModel').value,
+      ...($('cfgLlmKey').value.trim() ? { llm_api_key: $('cfgLlmKey').value.trim() } : {}),
     }),
   });
   sites = sites.map((s) => (s.id === currentSiteId ? res.site : s));
@@ -286,7 +293,9 @@ $('addTextDocForm').addEventListener('submit', async (e) => {
 $('addUrlForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   try {
-    await api(`/api/sites/${currentSiteId}/knowledge/url`, {
+    const isCrawl = $('kbCrawlMode').checked;
+    const endpoint = isCrawl ? `/api/sites/${currentSiteId}/knowledge/crawl` : `/api/sites/${currentSiteId}/knowledge/url`;
+    await api(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: $('kbUrlInput').value }),
@@ -295,6 +304,20 @@ $('addUrlForm').addEventListener('submit', async (e) => {
     await loadKnowledge();
   } catch (err) {
     alert(err.message);
+  }
+});
+
+$('syncAllUrlsBtn').addEventListener('click', async () => {
+  $('syncAllUrlsBtn').textContent = 'Синхронизация...';
+  try {
+    const res = await api(`/api/sites/${currentSiteId}/knowledge/sync-all`, { method: 'POST' });
+    await loadKnowledge();
+    $('syncAllUrlsBtn').textContent = `Обновлено: ${res.updated}/${res.total}`;
+    setTimeout(() => {
+      $('syncAllUrlsBtn').innerHTML = '<span class="material-symbols-outlined text-[14px]">sync</span> Обновить URL';
+    }, 2000);
+  } catch (_e) {
+    $('syncAllUrlsBtn').innerHTML = '<span class="material-symbols-outlined text-[14px]">sync</span> Обновить URL';
   }
 });
 

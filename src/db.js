@@ -34,6 +34,12 @@ db.exec(`
     price_api_offline INTEGER DEFAULT 0,
     token_budget INTEGER DEFAULT 500000,
     tokens_used INTEGER DEFAULT 0,
+    llm_provider TEXT DEFAULT 'local',
+    llm_model TEXT DEFAULT '',
+    llm_api_key TEXT DEFAULT '',
+    llm_base_url TEXT DEFAULT '',
+    auto_sync_hours INTEGER DEFAULT 24,
+    owner_id TEXT DEFAULT '',
     created_at TEXT DEFAULT (datetime('now'))
   );
 
@@ -138,6 +144,13 @@ db.exec(`
     status TEXT DEFAULT 'confirmed',
     created_at TEXT DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 // Safe migrations for existing DBs
@@ -145,6 +158,12 @@ for (const col of [
   "ALTER TABLE sites ADD COLUMN widget_bg TEXT DEFAULT '#ffffff'",
   "ALTER TABLE sites ADD COLUMN widget_shape TEXT DEFAULT 'rounded'",
   "ALTER TABLE sites ADD COLUMN widget_avatar TEXT DEFAULT ''",
+  "ALTER TABLE sites ADD COLUMN llm_provider TEXT DEFAULT 'local'",
+  "ALTER TABLE sites ADD COLUMN llm_model TEXT DEFAULT ''",
+  "ALTER TABLE sites ADD COLUMN llm_api_key TEXT DEFAULT ''",
+  "ALTER TABLE sites ADD COLUMN llm_base_url TEXT DEFAULT ''",
+  "ALTER TABLE sites ADD COLUMN auto_sync_hours INTEGER DEFAULT 24",
+  "ALTER TABLE sites ADD COLUMN owner_id TEXT DEFAULT ''",
 ]) {
   try { db.exec(col); } catch (_e) {}
 }

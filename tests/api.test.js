@@ -123,6 +123,36 @@ test('Confirmed action flow proposes and executes order with stock decrement', a
   assert.equal(conf.data.confirmed, true);
 });
 
+test('Auth register, login, and /api/auth/me work', async () => {
+  const email = `owner_${Date.now()}@nordictech.eu`;
+  const reg = await jsonReq('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({ email, name: 'Test Owner', password: 'secret123' }),
+  });
+  assert.equal(reg.status, 201);
+  assert.ok(reg.data.token);
+
+  const me = await jsonReq('/api/auth/me', {
+    headers: { Authorization: `Bearer ${reg.data.token}` },
+  });
+  assert.equal(me.status, 200);
+  assert.equal(me.data.user.email, email);
+});
+
+test('LLM provider settings mask API key and sync-all responds 200', async () => {
+  const upd = await jsonReq('/api/sites/site_nordic_tech', {
+    method: 'PATCH',
+    body: JSON.stringify({ llm_provider: 'local', llm_api_key: 'test_secret_key' }),
+  });
+  assert.equal(upd.status, 200);
+  assert.equal(upd.data.site.has_llm_api_key, true);
+  assert.equal(upd.data.site.llm_api_key, undefined);
+
+  const sync = await jsonReq('/api/sites/site_nordic_tech/knowledge/sync-all', { method: 'POST' });
+  assert.equal(sync.status, 200);
+  assert.equal(typeof sync.data.total, 'number');
+});
+
 test('FAQ direct match uses 0 tokens', async () => {
   const chat = await jsonReq('/api/chat', {
     method: 'POST',

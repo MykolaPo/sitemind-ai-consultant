@@ -222,6 +222,26 @@
                   <input id="cfgStrict" type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-600" />
                   <span>Строгий режим (запретить домыслы при отсутствии фактов)</span>
                 </label>
+
+                <div class="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">LLM-провайдер</label>
+                    <select id="cfgLlmProvider" class="w-full rounded-lg border-slate-200 text-[12px]">
+                      <option value="local">Local (встроенный, 0 ₴)</option>
+                      <option value="gemini">Google Gemini</option>
+                      <option value="openai">OpenAI / Compatible</option>
+                      <option value="ollama">Ollama (локально)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Модель (опционально)</label>
+                    <input id="cfgLlmModel" type="text" placeholder="gemini-2.5-flash / llama3.1" class="w-full rounded-lg border-slate-200 text-[12px]" />
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-medium text-slate-600 mb-1">API-ключ провайдера</label>
+                    <input id="cfgLlmKey" type="password" placeholder="Оставьте пустым, если сохранён" class="w-full rounded-lg border-slate-200 text-[12px]" />
+                  </div>
+                </div>
               </div>
             </details>
 
@@ -257,9 +277,15 @@
                 </form>
               </div>
               <div class="space-y-3">
-                <form id="addUrlForm" class="flex gap-2">
-                  <input id="kbUrlInput" type="url" placeholder="https://site.com/page" class="flex-1 rounded-lg border-slate-200 text-[12px]" required />
-                  <button type="submit" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white text-[12px] font-semibold">URL</button>
+                <form id="addUrlForm" class="space-y-2">
+                  <div class="flex gap-2">
+                    <input id="kbUrlInput" type="url" placeholder="https://site.com/page" class="flex-1 rounded-lg border-slate-200 text-[12px]" required />
+                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white text-[12px] font-semibold">URL</button>
+                  </div>
+                  <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
+                    <input id="kbCrawlMode" type="checkbox" class="rounded border-slate-300 text-sky-600" />
+                    <span>Авто-краулер (обойти sitemap / ссылки до 8 страниц)</span>
+                  </label>
                 </form>
                 <form id="addFaqForm" class="space-y-2">
                   <input id="faqQuestion" type="text" placeholder="Частый вопрос (FAQ)..." class="w-full rounded-lg border-slate-200 text-[12px]" required />
@@ -274,7 +300,12 @@
           <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-5">
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-headline-sm text-[15px] font-bold text-slate-900">Документы и страницы</h3>
-              <span id="docsCountBadge" class="font-label-code-sm text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600">0</span>
+              <div class="flex items-center gap-2">
+                <button id="syncAllUrlsBtn" type="button" class="text-[11px] font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">sync</span> Обновить URL
+                </button>
+                <span id="docsCountBadge" class="font-label-code-sm text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600">0</span>
+              </div>
             </div>
             <div id="docsList" class="space-y-2"></div>
           </div>

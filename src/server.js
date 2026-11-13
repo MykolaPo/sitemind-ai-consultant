@@ -9,6 +9,7 @@ const { db, genId } = require('./db');
 const { indexDocumentChunks, searchKnowledge } = require('./rag');
 const { handleChat } = require('./agent');
 const { seedIfEmpty } = require('./seed');
+const { crawlAndIndexSite, syncAllUrlDocs } = require('./crawler');
 
 seedIfEmpty();
 
@@ -57,9 +58,78 @@ app.get(['/health', '/api/health'], (_req, res) => {
   res.json({ status: 'ok', service: 'sitemind-ai', timestamp: new Date().toISOString() });
 });
 
+// Auth helpers (scrypt + HMAC-SHA256 token)
+const AUTH_SECRET = process.env.AUTH_SECRET || crypto.createHash('sha256').update(process.env.DB_PATH || 'sitemind-local-secret').digest('hex');
+
+function hashPassword(pw) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.scryptSync(String(pw), salt, 32).toString('hex');
+  return `${salt}:${hash}`;
+}
+
+function verifyPassword(pw, stored) {
+  const [salt, hash] = String(stored || '').split(':');
+  if (!salt || !hash) return false;
+  const derived = crypto.scryptSync(String(pw), salt, 32).toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(derived, 'hex'));
+}
+
+function signToken(payload) {
+  const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const sig = crypto.createHmac('sha256', AUTH_SECRET).update(data).digest('base64url');
+  return `${data}.${sig}`;
+}
+
+function verifyToken(token) {
+  const [data, sig] = String(token || '').split('.');
+  if (!data || !sig) return null;
+  const expected = crypto.createHmac('sha256', AUTH_SECRET).update(data).digest('base64url');
+  if (sig !== expected) return null;
+  try { return JSON.parse(Buffer.from(data, 'base64url').toString('utf8')); } catch (_e) { return null; }
+}
+
+app.post('/api/auth/register', (req, res) => {
+  const { email, name, password } = req.body || {};
+  if (!email || !name || !password || String(password).length < 6) {
+    return res.status(400).json({ error: 'Email, name, and password (min 6 chars) are required' });
+  }
+  const cleanEmail = String(email).trim().toLowerCase();
+  const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(cleanEmail);
+  if (existing) return res.status(409).json({ error: 'Email already registered' });
+
+  const id = genId('usr');
+  db.prepare('INSERT INTO users (id, email, name, password_hash) VALUES (?, ?, ?, ?)')
+    .run(id, cleanEmail, String(name).trim(), hashPassword(password));
+  const token = signToken({ id, email: cleanEmail, name: String(name).trim() });
+  res.status(201).json({ token, user: { id, email: cleanEmail, name: String(name).trim() } });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body || {};
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(String(email || '').trim().toLowerCase());
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+  const token = signToken({ id: user.id, email: user.email, name: user.name });
+  res.json({ token, user: { id: user.id, email: user.email, name: user.name } });
+});
+
+app.get('/api/auth/me', (req, res) => {
+  const auth = req.headers.authorization || '';
+  const payload = verifyToken(auth.replace(/^Bearer\s+/i, ''));
+  if (!payload) return res.status(401).json({ error: 'Unauthorized' });
+  res.json({ user: payload });
+});
+
+function sanitizeSiteForClient(site) {
+  if (!site) return site;
+  const { llm_api_key, ...rest } = site;
+  return { ...rest, has_llm_api_key: Boolean(llm_api_key) };
+}
+
 // Sites CRUD
 app.get('/api/sites', (_req, res) => {
-  const sites = db.prepare('SELECT * FROM sites ORDER BY created_at ASC').all();
+  const sites = db.prepare('SELECT * FROM sites ORDER BY created_at ASC').all().map(sanitizeSiteForClient);
   res.json({ sites });
 });
 
@@ -99,6 +169,7 @@ app.patch('/api/sites/:siteId', (req, res) => {
     'widget_bg', 'widget_shape', 'widget_avatar',
     'widget_position', 'language', 'system_prompt', 'strict_mode',
     'price_api_url', 'price_api_offline', 'token_budget',
+    'llm_provider', 'llm_model', 'llm_api_key', 'llm_base_url', 'auto_sync_hours',
   ];
   const updates = [];
   const values = [];
@@ -117,7 +188,7 @@ app.patch('/api/sites/:siteId', (req, res) => {
     db.prepare(`UPDATE sites SET ${updates.join(', ')} WHERE id = ?`).run(...values);
   }
   const updated = db.prepare('SELECT * FROM sites WHERE id = ?').get(site.id);
-  res.json({ site: updated });
+  res.json({ site: sanitizeSiteForClient(updated) });
 });
 
 app.delete('/api/sites/:siteId', (req, res) => {
@@ -252,6 +323,24 @@ app.post('/api/sites/:siteId/knowledge/search', (req, res) => {
   if (!query) return res.status(400).json({ error: 'Query is required' });
   const results = searchKnowledge(site.id, query, 5);
   res.json({ results });
+});
+
+app.post('/api/sites/:siteId/knowledge/crawl', async (req, res) => {
+  const site = getSiteOr404(req.params.siteId, res);
+  if (!site) return;
+  const { url, max_pages = 8 } = req.body || {};
+  if (!url || !/^https?:\/\//i.test(url)) {
+    return res.status(400).json({ error: 'Valid http(s) URL is required' });
+  }
+  const indexed = await crawlAndIndexSite(site.id, url, Math.min(Number(max_pages) || 8, 15));
+  res.status(201).json({ crawled: indexed.length, pages: indexed });
+});
+
+app.post('/api/sites/:siteId/knowledge/sync-all', async (req, res) => {
+  const site = getSiteOr404(req.params.siteId, res);
+  if (!site) return;
+  const result = await syncAllUrlDocs(site.id);
+  res.json(result);
 });
 
 app.post('/api/sites/:siteId/knowledge/:docId/sync', async (req, res) => {
@@ -499,6 +588,14 @@ app.get('/api/sites/:siteId/analytics', (req, res) => {
 });
 
 if (require.main === module) {
+  // Periodic background auto-sync for URL documents (hourly check)
+  setInterval(() => {
+    const sites = db.prepare('SELECT id FROM sites').all();
+    for (const s of sites) {
+      syncAllUrlDocs(s.id).catch(() => {});
+    }
+  }, 60 * 60 * 1000).unref();
+
   app.listen(PORT, () => {
     console.log(`SiteMind AI microservice running at http://localhost:${PORT}`);
   });
