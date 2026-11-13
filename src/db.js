@@ -73,7 +73,7 @@ db.exec(`
     category TEXT DEFAULT 'Общее',
     price REAL NOT NULL,
     old_price REAL DEFAULT NULL,
-    currency TEXT DEFAULT '₽',
+    currency TEXT DEFAULT '€',
     stock INTEGER DEFAULT 0,
     url TEXT DEFAULT '',
     description TEXT DEFAULT '',
@@ -124,6 +124,16 @@ db.exec(`
     hits INTEGER DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now')),
     UNIQUE(site_id, query_hash)
+  );
+
+  CREATE TABLE IF NOT EXISTS confirmed_actions (
+    id TEXT PRIMARY KEY,
+    site_id TEXT NOT NULL REFERENCES sites(id) ON DELETE CASCADE,
+    dialog_id TEXT DEFAULT '',
+    action_type TEXT NOT NULL,
+    payload_json TEXT NOT NULL,
+    status TEXT DEFAULT 'confirmed',
+    created_at TEXT DEFAULT (datetime('now'))
   );
 `);
 

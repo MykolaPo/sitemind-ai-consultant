@@ -13,10 +13,10 @@ const INJECTION_PATTERNS = [
 ];
 
 const COMMERCIAL_KEYWORDS = [
-  'цена', 'стоит', 'стоимость', 'прайс', 'сколько', 'руб', '₽', '$', '€', 'uah', '₴',
+  'цена', 'стоит', 'стоимость', 'прайс', 'сколько', 'грн', 'евро', '$', '€', 'uah', '₴', 'eur', 'pln',
   'скидк', 'акци', 'налич', 'остаток', 'купить', 'заказ', 'оформ', 'доставк', 'товар', 'услуг',
   'price', 'cost', 'how much', 'discount', 'stock', 'available', 'buy', 'order',
-  'ціна', 'скільки', 'знижк', 'наявн', 'купити',
+  'ціна', 'скільки', 'знижк', 'наявн', 'купити', 'замов',
 ];
 
 const HUMAN_HANDOFF_KEYWORDS = [
@@ -103,7 +103,7 @@ function matchProducts(products, query) {
 }
 
 function formatPriceLine(p) {
-  const cur = p.currency || '₽';
+  const cur = p.currency || '€';
   const priceStr = `${Number(p.price).toLocaleString('ru-RU')} ${cur}`;
   const oldStr = p.old_price ? ` (было ${Number(p.old_price).toLocaleString('ru-RU')} ${cur})` : '';
   const stockStr = Number(p.stock) > 0 ? `в наличии: ${p.stock} шт.` : 'нет в наличии';
@@ -310,6 +310,7 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
 
   const parts = [];
   const sources = [];
+  let actionProposal = null;
 
   if (matchedProducts.length > 0) {
     parts.push(msg.livePrefix);
@@ -322,9 +323,20 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
     if (sources.filter((s) => s.type === 'live-api').length === 0) {
       sources.push({ title: liveResult.sourceLabel, type: 'live-api' });
     }
-    if (/заказ|оформ|купить|order|buy|замов/i.test(cleanQuery)) {
-      const anyInStock = matchedProducts.some((p) => Number(p.stock) > 0);
-      parts.push(anyInStock ? msg.orderReady : msg.orderOutOfStock);
+    if (/заказ|оформ|купить|order|buy|замов|запис/i.test(cleanQuery)) {
+      const inStockItem = matchedProducts.find((p) => Number(p.stock) > 0);
+      parts.push(inStockItem ? msg.orderReady : msg.orderOutOfStock);
+      if (inStockItem) {
+        actionProposal = {
+          type: 'create_order',
+          label: `Подтвердить заказ: ${inStockItem.name} (${inStockItem.price} ${inStockItem.currency || '€'})`,
+          product_id: inStockItem.id,
+          sku: inStockItem.sku,
+          name: inStockItem.name,
+          price: inStockItem.price,
+          currency: inStockItem.currency || '€',
+        };
+      }
     }
   }
 
@@ -373,6 +385,7 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
     cache_hit: false,
     tokens_used: tokensUsed,
     needs_human: false,
+    action_proposal: actionProposal,
   };
 }
 

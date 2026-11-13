@@ -117,6 +117,36 @@ function appendChatMessage(role, text, meta = null) {
     }
   }
   bubble.innerHTML = html;
+  if (role === 'bot' && meta?.action_proposal) {
+    const act = meta.action_proposal;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mt-2 w-full py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[12px] font-semibold transition-colors';
+    btn.textContent = act.label || 'Подтвердить действие';
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.textContent = 'Подтверждение...';
+      try {
+        const res = await api('/api/actions/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            site_id: currentSiteId,
+            dialog_id: currentDialogId,
+            action_type: act.type,
+            payload: act,
+          }),
+        });
+        btn.textContent = `✓ Подтверждено (${res.action_id})`;
+        btn.className = 'mt-2 w-full py-1.5 px-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[12px] font-semibold';
+        await Promise.all([loadProducts(), loadAnalyticsAndDialogs()]);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = `Ошибка: ${err.message}`;
+      }
+    });
+    bubble.appendChild(btn);
+  }
   wrap.appendChild(bubble);
   const box = $('chatMessages');
   box.appendChild(wrap);
@@ -365,8 +395,9 @@ async function loadAnalyticsAndDialogs() {
   ]);
 
   $('kpiDialogs').textContent = an.totalDialogs;
+  $('kpiConversions').textContent = an.conversionsCount || 0;
   $('kpiSavings').textContent = `${an.savingsPct}%`;
-  $('kpiTokens').textContent = `${an.tokensUsed.toLocaleString('ru-RU')} ($${an.estimatedCostUsd})`;
+  $('kpiTokens').textContent = `${an.tokensUsed.toLocaleString('ru-RU')}`;
   $('kpiUnanswered').textContent = an.unansweredCount;
 
   const unList = $('unansweredList');

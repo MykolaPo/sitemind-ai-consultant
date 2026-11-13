@@ -329,7 +329,7 @@ app.get('/api/sites/:siteId/products', (req, res) => {
 app.post('/api/sites/:siteId/products', (req, res) => {
   const site = getSiteOr404(req.params.siteId, res);
   if (!site) return;
-  const { sku, name, category = 'Общее', price, old_price = null, currency = '₽', stock = 10, url = '', description = '' } = req.body || {};
+  const { sku, name, category = 'Общее', price, old_price = null, currency = '€', stock = 10, url = '', description = '' } = req.body || {};
   if (!sku || !name || price === undefined || Number.isNaN(Number(price))) {
     return res.status(400).json({ error: 'Fields "sku", "name", and numeric "price" are required' });
   }
@@ -386,6 +386,33 @@ app.post('/api/chat', chatRateLimit, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: `Chat processing error: ${err.message}` });
   }
+});
+
+// Confirmed Actions (Orders / Bookings with user confirmation)
+app.post('/api/actions/confirm', (req, res) => {
+  const { site_id, dialog_id = '', action_type = 'create_order', payload = {} } = req.body || {};
+  if (!site_id) return res.status(400).json({ error: 'site_id is required' });
+  const site = getSiteOr404(site_id, res);
+  if (!site) return;
+
+  if (payload.product_id) {
+    const prod = db.prepare('SELECT * FROM live_products WHERE id = ? AND site_id = ?').get(payload.product_id, site.id);
+    if (!prod || prod.stock <= 0) {
+      return res.status(400).json({ error: 'Товар отсутствует на складе' });
+    }
+    db.prepare("UPDATE live_products SET stock = stock - 1, updated_at = datetime('now') WHERE id = ? AND site_id = ?").run(prod.id, site.id);
+  }
+
+  const actionId = genId('act');
+  db.prepare('INSERT INTO confirmed_actions (id, site_id, dialog_id, action_type, payload_json) VALUES (?, ?, ?, ?, ?)')
+    .run(actionId, site.id, dialog_id, action_type, JSON.stringify(payload));
+
+  if (dialog_id) {
+    db.prepare('INSERT INTO messages (id, dialog_id, site_id, role, content, model_used) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(genId('msg'), dialog_id, site.id, 'assistant', `✅ Действие подтверждено (${actionId}): ${payload.name || action_type}. Менеджер получил заявку.`, 'action-executor');
+  }
+
+  res.status(201).json({ confirmed: true, action_id: actionId });
 });
 
 // Dialogs & Unanswered Questions & Analytics
@@ -446,6 +473,7 @@ app.get('/api/sites/:siteId/analytics', (req, res) => {
   const unansweredCount = db.prepare('SELECT COUNT(*) AS cnt FROM unanswered_questions WHERE site_id = ? AND resolved = 0').get(site.id).cnt;
   const docsCount = db.prepare('SELECT COUNT(*) AS cnt FROM knowledge_docs WHERE site_id = ?').get(site.id).cnt;
   const productsCount = db.prepare('SELECT COUNT(*) AS cnt FROM live_products WHERE site_id = ?').get(site.id).cnt;
+  const conversionsCount = db.prepare('SELECT COUNT(*) AS cnt FROM confirmed_actions WHERE site_id = ?').get(site.id).cnt;
   const savingsPct = assistantMessages > 0 ? Math.round(((cacheHits + faqHits) / assistantMessages) * 100) : 0;
 
   res.json({
@@ -459,6 +487,7 @@ app.get('/api/sites/:siteId/analytics', (req, res) => {
     unansweredCount,
     docsCount,
     productsCount,
+    conversionsCount,
     tokensUsed: site.tokens_used,
     tokenBudget: site.token_budget,
     estimatedCostUsd: Number(((site.tokens_used / 1000) * 0.0004).toFixed(4)),
