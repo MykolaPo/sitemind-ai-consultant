@@ -61,6 +61,8 @@ async function refreshCurrentSite() {
 
   const origin = window.location.origin;
   $('embedScriptCode').textContent = `<script src="${origin}/widget.js" data-site-id="${site.id}" data-lang="${site.language}" data-position="${site.widget_position}" data-color="${site.widget_color}" async></script>`;
+  $('embedIframeCode').textContent = `<iframe src="${origin}/widget-frame.html?siteId=${site.id}" width="380" height="520" style="border:1px solid #e2e8f0;border-radius:12px;"></iframe>`;
+  $('embedReactCode').textContent = `useEffect(() => { const s = document.createElement('script'); s.src='${origin}/widget.js'; s.dataset.siteId='${site.id}'; s.async=true; document.body.appendChild(s); }, []);`;
   $('embedApiCode').textContent = `curl -X POST ${origin}/api/chat -H "Content-Type: application/json" -d '{"site_id":"${site.id}","message":"Сколько стоит товар?"}'`;
 
   $('cfgTitle').value = site.widget_title || '';
@@ -175,12 +177,22 @@ async function loadKnowledge() {
         </div>
         <p class="text-[12px] text-slate-500 mt-1 line-clamp-2">${escapeHtml(d.preview)}</p>
       </div>
-      <button onclick="deleteDoc('${d.id}')" class="text-slate-400 hover:text-red-600 p-1" title="Удалить">
-        <span class="material-symbols-outlined text-[18px]">delete</span>
-      </button>
+      <div class="flex items-center gap-1 shrink-0">
+        <button onclick="syncDoc('${d.id}')" class="text-slate-400 hover:text-sky-600 p-1" title="Синхронизировать">
+          <span class="material-symbols-outlined text-[18px]">sync</span>
+        </button>
+        <button onclick="deleteDoc('${d.id}')" class="text-slate-400 hover:text-red-600 p-1" title="Удалить">
+          <span class="material-symbols-outlined text-[18px]">delete</span>
+        </button>
+      </div>
     </div>
   `).join('');
 }
+
+window.syncDoc = async (docId) => {
+  await api(`/api/sites/${currentSiteId}/knowledge/${docId}/sync`, { method: 'POST' });
+  await loadKnowledge();
+};
 
 window.deleteDoc = async (docId) => {
   await api(`/api/sites/${currentSiteId}/knowledge/${docId}`, { method: 'DELETE' });

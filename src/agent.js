@@ -120,6 +120,21 @@ function getLangMessages(lang = 'ru') {
       handoff: 'I have flagged this conversation for a human specialist. An operator will follow up with you shortly.',
       livePrefix: 'Verified live catalog data:',
       kbPrefix: 'From the verified knowledge base:',
+      orderReady: 'To place an order, open the product link above or provide your contact details for our manager.',
+      orderOutOfStock: 'This item is currently out of stock (0 available), so an immediate order cannot be placed.',
+    };
+  }
+  if (lang === 'uk') {
+    return {
+      injectionBlocked: 'Запит відхилено системою захисту: я відповідаю лише за перевіреною базою знань та актуальним прайсом.',
+      budgetExceeded: 'Вичерпано ліміт токенів для цього сайту. Зверніться до адміністратора.',
+      apiUnavailable: 'Джерело актуальних цін та наявності зараз недоступне. Щоб не надати застарілу ціну, я не можу назвати вартість прямо зараз.',
+      noData: 'У мене немає підтвердженої інформації за цим запитом у базі знань та каталозі сайту. Я зберіг питання для команди — передати діалог оператору?',
+      handoff: 'Я передав ваш запит оператору. Спеціаліст підключиться найближчим часом.',
+      livePrefix: 'Актуальні дані з каталогу (перевірено в реальному часі):',
+      kbPrefix: 'За даними бази знань сайту:',
+      orderReady: 'Для оформлення замовлення перейдіть за посиланням на товар вище або залиште контакт менеджеру.',
+      orderOutOfStock: 'Наразі цього товару немає в наявності (0 шт.), тому миттєве замовлення недоступне.',
     };
   }
   return {
@@ -130,6 +145,8 @@ function getLangMessages(lang = 'ru') {
     handoff: 'Я передал ваш запрос оператору. Специалист подключится к диалогу и поможет с решением вопроса.',
     livePrefix: 'Актуальные данные из каталога (проверено в реальном времени):',
     kbPrefix: 'По данным базы знаний сайта:',
+    orderReady: 'Для оформления заказа перейдите по ссылке товара выше или оставьте контакт менеджеру.',
+    orderOutOfStock: 'К сожалению, выбранный товар сейчас отсутствует на складе (0 шт.), поэтому оформить заказ нельзя.',
   };
 }
 
@@ -304,6 +321,10 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
     }
     if (sources.filter((s) => s.type === 'live-api').length === 0) {
       sources.push({ title: liveResult.sourceLabel, type: 'live-api' });
+    }
+    if (/заказ|оформ|купить|order|buy|замов/i.test(cleanQuery)) {
+      const anyInStock = matchedProducts.some((p) => Number(p.stock) > 0);
+      parts.push(anyInStock ? msg.orderReady : msg.orderOutOfStock);
     }
   }
 

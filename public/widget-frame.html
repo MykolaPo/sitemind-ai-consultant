@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SiteMind AI — Виджет</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #0f172a; height: 100vh; display: flex; flex-direction: column; }
+    .head { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 9999px; background: #10b981; }
+    .title { font-weight: 700; font-size: 14px; }
+    .msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .msg { max-width: 86%; padding: 9px 12px; border-radius: 12px; font-size: 13px; line-height: 1.45; }
+    .bot { align-self: flex-start; background: #ffffff; border: 1px solid #e2e8f0; }
+    .user { align-self: flex-end; background: #0284c7; color: #ffffff; }
+    .form { display: flex; gap: 8px; padding: 10px; background: #ffffff; border-top: 1px solid #e2e8f0; }
+    input { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; }
+    button { border: none; border-radius: 8px; background: #0284c7; color: #fff; padding: 0 14px; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="head"><span class="dot"></span><span class="title" id="wTitle">AI-Консультант</span></div>
+  <div class="msgs" id="msgs"></div>
+  <form class="form" id="form">
+    <input id="inp" type="text" placeholder="Задайте вопрос..." autocomplete="off" />
+    <button type="submit">→</button>
+  </form>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const siteId = params.get('siteId') || 'site_nordic_tech';
+    let dialogId = '';
+    const msgs = document.getElementById('msgs');
+    function add(role, text) {
+      const d = document.createElement('div');
+      d.className = 'msg ' + role;
+      d.innerHTML = String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>');
+      msgs.appendChild(d);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+    fetch('/api/sites/' + encodeURIComponent(siteId) + '/widget-config').then(r => r.json()).then(c => {
+      document.getElementById('wTitle').textContent = c.widget_title || 'AI-Консультант';
+      add('bot', c.widget_welcome || 'Здравствуйте!');
+    }).catch(() => add('bot', 'Здравствуйте!'));
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const inp = document.getElementById('inp');
+      const text = inp.value.trim();
+      if (!text) return;
+      inp.value = '';
+      add('user', text);
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ site_id: siteId, message: text, dialog_id: dialogId || undefined, channel: 'iframe' }),
+      });
+      const data = await res.json();
+      if (data.dialog_id) dialogId = data.dialog_id;
+      add('bot', data.answer || data.error || 'Ошибка');
+    });
+  </script>
+</body>
+</html>

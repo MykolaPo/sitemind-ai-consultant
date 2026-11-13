@@ -250,6 +250,37 @@ app.post('/api/sites/:siteId/knowledge/search', (req, res) => {
   res.json({ results });
 });
 
+app.post('/api/sites/:siteId/knowledge/:docId/sync', async (req, res) => {
+  const site = getSiteOr404(req.params.siteId, res);
+  if (!site) return;
+  const doc = db.prepare('SELECT * FROM knowledge_docs WHERE id = ? AND site_id = ?').get(req.params.docId, site.id);
+  if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+  let content = doc.raw_content;
+  if (doc.source_type === 'url' && doc.source_url) {
+    try {
+      const response = await fetch(doc.source_url, { signal: AbortSignal.timeout(6000) });
+      if (response.ok) {
+        const html = await response.text();
+        content = html
+          .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+          .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+          .replace(/<[^>]+>/g, ' ')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 30000);
+        db.prepare('UPDATE knowledge_docs SET raw_content = ? WHERE id = ? AND site_id = ?').run(content, doc.id, site.id);
+      }
+    } catch (err) {
+      return res.status(400).json({ error: `Sync failed: ${err.message}` });
+    }
+  }
+  const chunks = indexDocumentChunks(site.id, doc.id, content);
+  db.prepare('DELETE FROM response_cache WHERE site_id = ?').run(site.id);
+  res.json({ synced: true, chunks });
+});
+
 app.delete('/api/sites/:siteId/knowledge/:docId', (req, res) => {
   const site = getSiteOr404(req.params.siteId, res);
   if (!site) return;
