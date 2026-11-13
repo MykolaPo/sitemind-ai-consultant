@@ -96,6 +96,7 @@ app.patch('/api/sites/:siteId', (req, res) => {
 
   const allowed = [
     'name', 'domain', 'widget_title', 'widget_welcome', 'widget_color',
+    'widget_bg', 'widget_shape', 'widget_avatar',
     'widget_position', 'language', 'system_prompt', 'strict_mode',
     'price_api_url', 'price_api_offline', 'token_budget',
   ];
@@ -136,6 +137,9 @@ app.get('/api/sites/:siteId/widget-config', (req, res) => {
     widget_title: site.widget_title,
     widget_welcome: site.widget_welcome,
     widget_color: site.widget_color,
+    widget_bg: site.widget_bg || '#ffffff',
+    widget_shape: site.widget_shape || 'rounded',
+    widget_avatar: site.widget_avatar || '',
     widget_position: site.widget_position,
     language: site.language,
   });

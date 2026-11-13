@@ -51,9 +51,26 @@
     } catch (_e) {}
 
     const color = overrideColor || cfg.widget_color || '#0284c7';
+    const bg = cfg.widget_bg || '#ffffff';
+    const shape = cfg.widget_shape || 'rounded';
+    const avatar = (cfg.widget_avatar || '').trim();
     const pos = overridePos || cfg.widget_position || 'bottom-right';
     const lang = overrideLang || cfg.language || 'ru';
     const isLeft = pos === 'bottom-left';
+
+    const panelRadius = shape === 'sharp' ? '6px' : shape === 'pill' ? '24px' : '16px';
+    const btnRadius = shape === 'sharp' ? '10px' : '9999px';
+    const msgRadius = shape === 'sharp' ? '6px' : shape === 'pill' ? '18px' : '12px';
+
+    function renderAvatarHtml(sizePx) {
+      if (avatar && (/^https?:\/\//i.test(avatar) || avatar.startsWith('data:image/'))) {
+        return `<img src="${escapeHtml(avatar)}" alt="Avatar" style="width:${sizePx}px;height:${sizePx}px;border-radius:9999px;object-fit:cover;display:block;" />`;
+      }
+      if (avatar) {
+        return `<span style="font-size:${Math.round(sizePx * 0.6)}px;line-height:1;">${escapeHtml(avatar)}</span>`;
+      }
+      return `<svg width="${Math.round(sizePx * 0.6)}" height="${Math.round(sizePx * 0.6)}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+    }
 
     shadow.innerHTML = `
       <style>
@@ -71,7 +88,7 @@
         .sm-btn {
           width: 56px;
           height: 56px;
-          border-radius: 9999px;
+          border-radius: ${btnRadius};
           border: none;
           background: ${color};
           color: #ffffff;
@@ -80,6 +97,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          overflow: hidden;
           transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
         .sm-btn:hover { transform: translateY(-2px); }
@@ -88,9 +106,9 @@
           max-width: calc(100vw - 24px);
           height: 520px;
           max-height: calc(100vh - 100px);
-          background: #ffffff;
+          background: ${bg};
           border: 1px solid #e2e8f0;
-          border-radius: 16px;
+          border-radius: ${panelRadius};
           box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18);
           display: none;
           flex-direction: column;
@@ -98,7 +116,7 @@
         }
         .sm-panel.open { display: flex; }
         .sm-head {
-          background: #f8fafc;
+          background: ${bg};
           border-bottom: 1px solid #e2e8f0;
           padding: 14px 16px;
           display: flex;
@@ -106,9 +124,21 @@
           justify-content: space-between;
         }
         .sm-title-wrap { display: flex; align-items: center; gap: 10px; }
-        .sm-dot { width: 8px; height: 8px; border-radius: 9999px; background: #10b981; }
+        .sm-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 9999px;
+          background: ${color};
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          flex-shrink: 0;
+        }
+        .sm-dot { width: 8px; height: 8px; border-radius: 9999px; background: #10b981; display: inline-block; margin-right: 4px; }
         .sm-title { font-weight: 700; font-size: 14px; color: #0f172a; }
-        .sm-sub { font-size: 11px; color: #64748b; }
+        .sm-sub { font-size: 11px; color: #64748b; display: flex; align-items: center; }
         .sm-close {
           background: transparent;
           border: 1px solid #e2e8f0;
@@ -132,14 +162,14 @@
         .sm-msg {
           max-width: 86%;
           padding: 10px 12px;
-          border-radius: 12px;
+          border-radius: ${msgRadius};
           font-size: 13px;
           line-height: 1.45;
           word-wrap: break-word;
         }
         .sm-msg.bot {
           align-self: flex-start;
-          background: #ffffff;
+          background: ${bg};
           border: 1px solid #e2e8f0;
           color: #0f172a;
         }
@@ -176,7 +206,7 @@
           display: flex;
           gap: 8px;
           padding: 10px 12px;
-          background: #ffffff;
+          background: ${bg};
           border-top: 1px solid #e2e8f0;
         }
         .sm-input {
@@ -205,10 +235,10 @@
         <div class="sm-panel" id="smPanel" role="dialog" aria-label="AI Consultant">
           <div class="sm-head">
             <div class="sm-title-wrap">
-              <span class="sm-dot"></span>
+              <div class="sm-avatar">${renderAvatarHtml(32)}</div>
               <div>
                 <div class="sm-title">${escapeHtml(cfg.widget_title)}</div>
-                <div class="sm-sub">Проверенные данные · Live API</div>
+                <div class="sm-sub"><span class="sm-dot"></span>Проверенные данные · Live API</div>
               </div>
             </div>
             <button class="sm-close" id="smClose" aria-label="Закрыть">×</button>
@@ -222,9 +252,7 @@
           </form>
         </div>
         <button class="sm-btn" id="smToggle" aria-label="Открыть чат с AI-консультантом">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
+          ${renderAvatarHtml(34)}
         </button>
       </div>
     `;

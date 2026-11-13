@@ -162,13 +162,41 @@
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-              <div class="sm:col-span-3">
+              <div class="sm:col-span-2">
                 <label class="block text-[12px] font-medium text-slate-700 mb-1">Приветствие</label>
                 <input id="cfgWelcome" type="text" class="w-full rounded-lg border-slate-200 text-[13px]" />
               </div>
               <div>
-                <label class="block text-[12px] font-medium text-slate-700 mb-1">Цвет</label>
+                <label class="block text-[12px] font-medium text-slate-700 mb-1">Акцент</label>
                 <input id="cfgColor" type="color" class="w-full h-[38px] rounded-lg border-slate-200 p-1 cursor-pointer" />
+              </div>
+              <div>
+                <label class="block text-[12px] font-medium text-slate-700 mb-1">Фон</label>
+                <input id="cfgBg" type="color" class="w-full h-[38px] rounded-lg border-slate-200 p-1 cursor-pointer" />
+              </div>
+            </div>
+
+            <!-- Shape & Avatar customization -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+              <div>
+                <label class="block text-[12px] font-medium text-slate-700 mb-1">Форма виджета</label>
+                <select id="cfgShape" class="w-full rounded-lg border-slate-200 text-[13px]">
+                  <option value="rounded">Округлый (по умолчанию)</option>
+                  <option value="sharp">Строгий прямоугольный</option>
+                  <option value="pill">Мягкий (Pill)</option>
+                </select>
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-[12px] font-medium text-slate-700">Аватарка (URL или эмодзи)</label>
+                  <div class="flex gap-1">
+                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="🤖">🤖</button>
+                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="⚡">⚡</button>
+                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="✨">✨</button>
+                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="💬">💬</button>
+                  </div>
+                </div>
+                <input id="cfgAvatar" type="text" placeholder="https://... или эмодзи 🤖" class="w-full rounded-lg border-slate-200 text-[13px]" />
               </div>
             </div>
 
@@ -354,12 +382,15 @@
       </div>
 
       <!-- Right 4 cols: Live Interactive Chat Sandbox -->
-      <aside class="lg:col-span-4 rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col lg:sticky lg:top-20" style="height: 580px;">
+      <aside id="previewAside" class="lg:col-span-4 rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col lg:sticky lg:top-20" style="height: 580px;">
         <div id="previewHeader" class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <div class="flex items-center gap-2.5">
+            <div id="previewAvatar" class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center text-[15px] overflow-hidden shrink-0">🤖</div>
             <div>
-              <div id="previewTitle" class="font-headline-sm text-[14px] font-bold text-slate-900">AI-Консультант</div>
+              <div class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <div id="previewTitle" class="font-headline-sm text-[14px] font-bold text-slate-900">AI-Консультант</div>
+              </div>
               <div class="text-[11px] text-slate-500">Проверка работы агента</div>
             </div>
           </div>

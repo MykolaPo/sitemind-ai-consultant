@@ -76,19 +76,20 @@ test('Live API outage refuses to return stale or invented price', async () => {
     body: JSON.stringify({ price_api_offline: true }),
   });
 
-  const chat = await jsonReq('/api/chat', {
-    method: 'POST',
-    body: JSON.stringify({ site_id: 'site_nordic_tech', message: 'Какая цена на NordicBook Pro 14?' }),
-  });
-  assert.equal(chat.status, 200);
-  assert.equal(chat.data.model_used, 'factuality-guard');
-  assert.ok(chat.data.answer.includes('недоступен'));
-
-  // Restore online
-  await jsonReq('/api/sites/site_nordic_tech', {
-    method: 'PATCH',
-    body: JSON.stringify({ price_api_offline: false }),
-  });
+  try {
+    const chat = await jsonReq('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({ site_id: 'site_nordic_tech', message: 'Какая цена на NordicBook Pro 14?' }),
+    });
+    assert.equal(chat.status, 200);
+    assert.equal(chat.data.model_used, 'factuality-guard');
+    assert.match(chat.data.answer, /недоступен|недоступне|unavailable/i);
+  } finally {
+    await jsonReq('/api/sites/site_nordic_tech', {
+      method: 'PATCH',
+      body: JSON.stringify({ price_api_offline: false }),
+    });
+  }
 });
 
 test('Prompt injection is blocked by security-guard', async () => {

@@ -68,6 +68,9 @@ async function refreshCurrentSite() {
   $('cfgTitle').value = site.widget_title || '';
   $('cfgWelcome').value = site.widget_welcome || '';
   $('cfgColor').value = site.widget_color || '#0284c7';
+  $('cfgBg').value = site.widget_bg || '#ffffff';
+  $('cfgShape').value = site.widget_shape || 'rounded';
+  $('cfgAvatar').value = site.widget_avatar || '';
   $('cfgPos').value = site.widget_position || 'bottom-right';
   $('cfgLang').value = site.language || 'ru';
   $('cfgPrompt').value = site.system_prompt || '';
@@ -76,11 +79,30 @@ async function refreshCurrentSite() {
   $('priceApiUrlInput').value = site.price_api_url || '';
   $('simulateOfflineToggle').checked = Boolean(site.price_api_offline);
 
-  $('previewTitle').textContent = site.widget_title || 'AI-Консультант';
-  $('chatSendBtn').style.backgroundColor = site.widget_color || '#0284c7';
+  applyPreviewStyle(site);
 
   resetChatPreview();
   await Promise.all([loadKnowledge(), loadFaqs(), loadProducts(), loadAnalyticsAndDialogs()]);
+}
+
+function applyPreviewStyle(site) {
+  const color = site?.widget_color || '#0284c7';
+  const bg = site?.widget_bg || '#ffffff';
+  const shape = site?.widget_shape || 'rounded';
+  const avatar = (site?.widget_avatar || '').trim();
+
+  $('previewTitle').textContent = site?.widget_title || 'AI-Консультант';
+  $('chatSendBtn').style.backgroundColor = color;
+  $('previewAside').style.backgroundColor = bg;
+  $('previewAside').style.borderRadius = shape === 'sharp' ? '6px' : shape === 'pill' ? '24px' : '12px';
+
+  const avEl = $('previewAvatar');
+  avEl.style.backgroundColor = color;
+  if (avatar && (/^https?:\/\//i.test(avatar) || avatar.startsWith('data:image/'))) {
+    avEl.innerHTML = `<img src="${escapeHtml(avatar)}" alt="Avatar" class="w-full h-full object-cover" />`;
+  } else {
+    avEl.textContent = avatar || '🤖';
+  }
 }
 
 function resetChatPreview() {
@@ -167,6 +189,12 @@ $('copyScriptBtn').addEventListener('click', async () => {
 });
 
 // Save Site Settings
+document.querySelectorAll('.avatar-preset').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    $('cfgAvatar').value = btn.dataset.av;
+  });
+});
+
 $('siteSettingsForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const res = await api(`/api/sites/${currentSiteId}`, {
@@ -176,6 +204,9 @@ $('siteSettingsForm').addEventListener('submit', async (e) => {
       widget_title: $('cfgTitle').value,
       widget_welcome: $('cfgWelcome').value,
       widget_color: $('cfgColor').value,
+      widget_bg: $('cfgBg').value,
+      widget_shape: $('cfgShape').value,
+      widget_avatar: $('cfgAvatar').value,
       widget_position: $('cfgPos').value,
       language: $('cfgLang').value,
       system_prompt: $('cfgPrompt').value,

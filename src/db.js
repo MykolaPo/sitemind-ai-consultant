@@ -23,6 +23,9 @@ db.exec(`
     widget_title TEXT DEFAULT 'AI-Консультант',
     widget_welcome TEXT DEFAULT 'Здравствуйте! Помогу подобрать товар, уточнить актуальную цену и условия доставки.',
     widget_color TEXT DEFAULT '#0284c7',
+    widget_bg TEXT DEFAULT '#ffffff',
+    widget_shape TEXT DEFAULT 'rounded',
+    widget_avatar TEXT DEFAULT '',
     widget_position TEXT DEFAULT 'bottom-right',
     language TEXT DEFAULT 'ru',
     system_prompt TEXT DEFAULT 'Отвечай кратко, вежливо и строго по подтверждённым данным из базы знаний и Live API.',
@@ -136,6 +139,15 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now'))
   );
 `);
+
+// Safe migrations for existing DBs
+for (const col of [
+  "ALTER TABLE sites ADD COLUMN widget_bg TEXT DEFAULT '#ffffff'",
+  "ALTER TABLE sites ADD COLUMN widget_shape TEXT DEFAULT 'rounded'",
+  "ALTER TABLE sites ADD COLUMN widget_avatar TEXT DEFAULT ''",
+]) {
+  try { db.exec(col); } catch (_e) {}
+}
 
 function genId(prefix = 'id') {
   return `${prefix}_${crypto.randomBytes(6).toString('hex')}`;
