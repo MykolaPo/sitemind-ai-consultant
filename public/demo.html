@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NordicTech Store — Демонстрация встраивания 1-строчного виджета</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-900 font-['Inter'] antialiased min-h-screen">
+  <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between max-w-6xl mx-auto rounded-b-xl shadow-sm">
+    <div class="flex items-center gap-3">
+      <span class="font-['Manrope'] font-bold text-xl text-slate-900">NordicTech <span class="text-sky-600">Store</span></span>
+      <span class="text-xs font-['JetBrains_Mono'] px-2 py-0.5 rounded bg-sky-50 border border-sky-200 text-sky-700">Демо-сайт клиента</span>
+    </div>
+    <a href="/" class="text-sm font-medium text-sky-600 hover:text-sky-700">← Вернуться в админ-панель</a>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10 space-y-6">
+    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+      <h1 class="font-['Manrope'] font-bold text-2xl text-slate-900">Внешний сайт с подключённым AI-консультантом</h1>
+      <p class="text-slate-600 text-sm mt-2">На этой странице подключён виджет SiteMind AI одной строкой кода. Нажмите на синюю кнопку чата в правом нижнем углу и спросите про <strong>NordicBook Pro 14</strong>, <strong>доставку</strong> или <strong>оплату</strong>.</p>
+      <pre class="mt-4 p-3 rounded-lg bg-slate-900 text-sky-300 text-xs font-['JetBrains_Mono'] overflow-x-auto">&lt;script src="/widget.js" data-site-id="site_nordic_tech" async&gt;&lt;/script&gt;</pre>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+        <div class="text-xs font-['JetBrains_Mono'] text-slate-500">NT-LAP-14</div>
+        <h2 class="font-['Manrope'] font-bold text-lg mt-1">Ноутбук NordicBook Pro 14</h2>
+        <p class="text-sm text-slate-600 mt-1">14" IPS, 16 ГБ RAM, 512 ГБ SSD</p>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+        <div class="text-xs font-['JetBrains_Mono'] text-slate-500">NT-AUD-02</div>
+        <h2 class="font-['Manrope'] font-bold text-lg mt-1">Наушники ArcticSound ANC</h2>
+        <p class="text-sm text-slate-600 mt-1">Активное шумоподавление, 40 ч автономности</p>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+        <div class="text-xs font-['JetBrains_Mono'] text-slate-500">NT-MON-27</div>
+        <h2 class="font-['Manrope'] font-bold text-lg mt-1">Монитор GlacioView 27 4K</h2>
+        <p class="text-sm text-slate-600 mt-1">27" 4K UHD IPS, USB-C 90W</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/widget.js" data-site-id="site_nordic_tech" async></script>
+</body>
+</html>
