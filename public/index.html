@@ -1,475 +1,1125 @@
 <!DOCTYPE html>
-<html class="light" lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SiteMind AI — Универсальный AI-консультант для сайтов</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '#0284c7',
-            'primary-dark': '#0369a1',
-            background: '#f8fafc',
-            surface: '#ffffff',
-            'on-surface': '#0f172a',
-            'on-surface-variant': '#64748b',
-            'outline-variant': '#e2e8f0',
-          },
-          fontFamily: {
-            'headline-sm': ['Manrope', 'sans-serif'],
-            'body-md': ['Inter', 'sans-serif'],
-            'label-numeric': ['JetBrains Mono', 'monospace'],
-            'label-code-sm': ['JetBrains Mono', 'monospace'],
-          },
-        },
-      },
-    };
-  </script>
+  <title>SiteMind AI 98 — Instant Website AI Demo &amp; GEO (fatherreflex.art)</title>
+  <link rel="canonical" href="https://fatherreflex.art/" />
+  <meta name="description" content="24/7 AI Patient Concierge, Smart Search &amp; ChatGPT/Perplexity GEO Optimization — 1-line install at fatherreflex.art" />
   <style>
-    body { overscroll-behavior: none; font-family: 'Inter', sans-serif; }
-    .tab-btn.active { background: #ffffff; color: #0369a1; font-weight: 600; box-shadow: 0 1px 2px rgba(15,23,42,0.06); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
-    details > summary { list-style: none; cursor: pointer; }
-    details > summary::-webkit-details-marker { display: none; }
+    :root {
+      --teal: #008080;
+      --face: #c0c0c0;
+      --light: #ffffff;
+      --hi: #dfdfdf;
+      --dark: #808080;
+      --black: #000000;
+      --navy: #000080;
+      --navy-hi: #1084d0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--teal);
+      font-family: 'Tahoma', 'MS Sans Serif', 'Segoe UI', sans-serif;
+      font-size: 12px;
+      color: #000000;
+      user-select: none;
+    }
+
+    .mono {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    /* Authentic Windows 98 3D Bevels */
+    .win-out {
+      background: var(--face);
+      border-top: 1px solid var(--light);
+      border-left: 1px solid var(--light);
+      border-right: 1px solid var(--black);
+      border-bottom: 1px solid var(--black);
+      box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--dark);
+    }
+
+    .win-in {
+      background: #ffffff;
+      border-top: 1px solid var(--dark);
+      border-left: 1px solid var(--dark);
+      border-right: 1px solid var(--light);
+      border-bottom: 1px solid var(--light);
+      box-shadow: inset 1px 1px 0 var(--black), inset -1px -1px 0 var(--hi);
+    }
+
+    .win-sunken-gray {
+      background: var(--face);
+      border-top: 1px solid var(--dark);
+      border-left: 1px solid var(--dark);
+      border-right: 1px solid var(--light);
+      border-bottom: 1px solid var(--light);
+    }
+
+    /* Authentic Win98 Buttons */
+    .win-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 12px;
+      background: var(--face);
+      color: #000000;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 400;
+      border-top: 1px solid var(--light);
+      border-left: 1px solid var(--light);
+      border-right: 1px solid var(--black);
+      border-bottom: 1px solid var(--black);
+      box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--dark);
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .win-btn.default-btn {
+      outline: 1px solid #000000;
+      outline-offset: -1px;
+      font-weight: 700;
+    }
+    .win-btn:active, .win-btn.pressed {
+      border-top: 1px solid var(--black);
+      border-left: 1px solid var(--black);
+      border-right: 1px solid var(--light);
+      border-bottom: 1px solid var(--light);
+      box-shadow: inset 1px 1px 0 var(--dark);
+      padding-top: 1px;
+      padding-left: 13px;
+      padding-right: 11px;
+    }
+
+    /* Desktop Full-Screen Workspace (No Scroll) */
+    .desktop {
+      position: relative;
+      width: 100vw;
+      height: calc(100vh - 30px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px 14px 110px;
+      overflow: hidden;
+    }
+
+    /* Left Desktop Icons Column */
+    .desktop-icons {
+      position: absolute;
+      top: 14px;
+      left: 12px;
+      bottom: 14px;
+      width: 86px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+    }
+
+    .desk-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 2px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 11px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .desk-icon span {
+      padding: 1px 3px;
+      line-height: 1.2;
+    }
+    .desk-icon:hover span, .desk-icon.active span {
+      background: var(--navy);
+      color: #ffffff;
+      outline: 1px dotted #ffff00;
+    }
+
+    /* Single Active Window Container */
+    .win-window {
+      width: 100%;
+      max-width: 820px;
+      padding: 3px;
+      display: none;
+      flex-direction: column;
+      position: relative;
+      z-index: 20;
+    }
+    .win-window.active {
+      display: flex;
+    }
+    .win-window.maximized {
+      max-width: none;
+      width: calc(100vw - 122px);
+      height: calc(100vh - 52px);
+    }
+
+    /* Authentic Windows 98 Titlebar & Pixel Controls */
+    .titlebar {
+      height: 20px;
+      padding: 2px 3px 2px 4px;
+      background: linear-gradient(90deg, var(--navy) 0%, var(--navy-hi) 100%);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .titlebar-left {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      min-width: 0;
+    }
+    .titlebar-left span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Exact Win98 16x14 Titlebar Control Buttons */
+    .title-controls {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .ctrl-btn {
+      width: 16px;
+      height: 14px;
+      padding: 0;
+      background: var(--face);
+      border-top: 1px solid var(--light);
+      border-left: 1px solid var(--light);
+      border-right: 1px solid var(--black);
+      border-bottom: 1px solid var(--black);
+      box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--dark);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .ctrl-btn.close-btn {
+      margin-left: 2px;
+    }
+    .ctrl-btn:active {
+      border-top: 1px solid var(--black);
+      border-left: 1px solid var(--black);
+      border-right: 1px solid var(--light);
+      border-bottom: 1px solid var(--light);
+      box-shadow: inset 1px 1px 0 var(--dark);
+    }
+    .ctrl-btn:active svg {
+      transform: translate(1px, 1px);
+    }
+
+    /* Menu Bar */
+    .menubar {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 4px;
+      border-bottom: 1px solid var(--dark);
+      box-shadow: 0 1px 0 var(--light);
+    }
+    .menu-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 2px 7px;
+      font-family: inherit;
+      font-size: 11px;
+      color: #000000;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .menu-btn:hover {
+      border-top: 1px solid var(--light);
+      border-left: 1px solid var(--light);
+      border-right: 1px solid var(--dark);
+      border-bottom: 1px solid var(--dark);
+    }
+
+    .win-content {
+      padding: 12px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* Authentic Win98 GroupBox */
+    fieldset.groupbox {
+      border: 1px solid var(--dark);
+      box-shadow: inset 1px 1px 0 var(--light), 1px 1px 0 var(--light);
+      padding: 9px 12px 11px;
+      margin: 0;
+    }
+    fieldset.groupbox legend {
+      padding: 0 5px;
+      font-weight: 700;
+      color: #000000;
+    }
+
+    /* Status Bar */
+    .statusbar {
+      display: flex;
+      gap: 3px;
+      padding-top: 2px;
+    }
+    .status-pane {
+      padding: 2px 6px;
+      font-size: 11px;
+      color: #000000;
+    }
+
+    /* Inputs */
+    .win-input, .win-select {
+      width: 100%;
+      height: 26px;
+      padding: 2px 8px;
+      font-family: inherit;
+      font-size: 12px;
+      background: #ffffff;
+      color: #000000;
+      border-top: 1px solid var(--dark);
+      border-left: 1px solid var(--dark);
+      border-right: 1px solid var(--light);
+      border-bottom: 1px solid var(--light);
+      box-shadow: inset 1px 1px 0 var(--black), inset -1px -1px 0 var(--hi);
+      outline: none;
+    }
+
+    /* Segmented Win98 Progress Bar */
+    .progress-box {
+      height: 16px;
+      padding: 2px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: repeating-linear-gradient(90deg, var(--navy) 0px, var(--navy) 8px, transparent 8px, transparent 10px);
+      transition: width 0.2s ease;
+    }
+
+    /* Authentic Windows 98 Taskbar (30px bottom) */
+    .taskbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 30px;
+      background: var(--face);
+      border-top: 1px solid var(--light);
+      box-shadow: inset 0 1px 0 var(--hi);
+      padding: 2px 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      z-index: 9000;
+    }
+    .start-btn {
+      height: 22px;
+      padding: 0 6px;
+      font-weight: 700;
+      font-size: 11px;
+      gap: 4px;
+    }
+    .taskbar-divider {
+      width: 2px;
+      height: 20px;
+      border-left: 1px solid var(--dark);
+      border-right: 1px solid var(--light);
+      margin: 0 2px;
+    }
+    .task-tabs {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .task-tab {
+      height: 22px;
+      min-width: 115px;
+      max-width: 170px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: inherit;
+      font-size: 11px;
+      text-align: left;
+      background: var(--face);
+      border-top: 1px solid var(--light);
+      border-left: 1px solid var(--light);
+      border-right: 1px solid var(--black);
+      border-bottom: 1px solid var(--black);
+      box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--dark);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .task-tab.active {
+      font-weight: 700;
+      background: #dfdfdf;
+      border-top: 1px solid var(--black);
+      border-left: 1px solid var(--black);
+      border-right: 1px solid var(--light);
+      border-bottom: 1px solid var(--light);
+      box-shadow: inset 1px 1px 0 var(--dark);
+    }
+    .tray {
+      height: 22px;
+      padding: 0 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    /* Start Menu Popup */
+    .start-menu {
+      position: fixed;
+      left: 2px;
+      bottom: 30px;
+      width: 220px;
+      padding: 2px;
+      z-index: 9500;
+      display: none;
+    }
+    .start-menu.open {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+    }
+    .start-sidebar {
+      background: linear-gradient(180deg, #000080 0%, #000040 100%);
+      color: #ffffff;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 3px;
+      letter-spacing: 0.05em;
+    }
+    .start-list {
+      display: flex;
+      flex-direction: column;
+      padding: 2px;
+    }
+    .start-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 11px;
+      color: #000000;
+      background: transparent;
+      border: none;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .start-item:hover {
+      background: var(--navy);
+      color: #ffffff;
+    }
+    .start-hr {
+      height: 2px;
+      border-top: 1px solid var(--dark);
+      border-bottom: 1px solid var(--light);
+      margin: 2px 3px;
+    }
+
+    @media (max-width: 760px) {
+      .desktop { padding: 72px 8px 8px 8px; }
+      .desktop-icons {
+        top: 6px;
+        left: 6px;
+        right: 6px;
+        bottom: auto;
+        width: auto;
+        flex-direction: row;
+        overflow-x: auto;
+      }
+      .win-window.maximized {
+        width: calc(100vw - 16px);
+        height: calc(100vh - 110px);
+      }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col selection:bg-sky-100 selection:text-sky-800">
+<body>
 
-  <!-- Header -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-    <div class="h-16 w-full max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <div class="w-9 h-9 rounded-lg bg-sky-100 border border-sky-200 flex items-center justify-center text-sky-700 shrink-0">
-          <span class="material-symbols-outlined text-[20px]">smart_toy</span>
+  <!-- Pixel-Art Win98 SVG Symbols (Zero Emojis) -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <g id="ico-min">
+        <rect x="1" y="7" width="6" height="2" fill="#000000"/>
+      </g>
+      <g id="ico-max">
+        <path fill="#000000" fill-rule="evenodd" d="M0 0h9v9H0V0zm1 2h7v6H1V2z"/>
+      </g>
+      <g id="ico-close">
+        <path fill="#000000" d="M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z"/>
+      </g>
+
+      <g id="ico-wiz-16">
+        <rect x="2" y="1" width="12" height="14" fill="#ffffff" stroke="#000"/>
+        <rect x="3" y="2" width="10" height="3" fill="#000080"/>
+        <rect x="4" y="7" width="8" height="2" fill="#008080"/>
+        <rect x="4" y="11" width="5" height="2" fill="#808080"/>
+      </g>
+      <g id="ico-folder-16">
+        <path d="M1 3h5l1 2h8v9H1V3z" fill="#ffe066" stroke="#000"/>
+        <rect x="2" y="5" width="12" height="1" fill="#ffffff"/>
+      </g>
+      <g id="ico-search-16">
+        <rect x="2" y="2" width="9" height="9" fill="#bae6fd" stroke="#000080"/>
+        <rect x="10" y="10" width="4" height="4" fill="#808080" stroke="#000"/>
+      </g>
+      <g id="ico-price-16">
+        <rect x="1" y="3" width="14" height="10" fill="#86efac" stroke="#000"/>
+        <rect x="6" y="5" width="4" height="6" fill="#065f46"/>
+      </g>
+      <g id="ico-mail-16">
+        <rect x="1" y="3" width="14" height="10" fill="#ffffff" stroke="#000"/>
+        <path d="M2 4l6 5 6-5" fill="none" stroke="#000080"/>
+      </g>
+      <g id="ico-gear-16">
+        <rect x="2" y="2" width="12" height="12" fill="#c0c0c0" stroke="#000"/>
+        <rect x="4" y="4" width="3" height="8" fill="#000080"/>
+        <rect x="9" y="6" width="3" height="6" fill="#008080"/>
+      </g>
+      <g id="ico-globe-16">
+        <rect x="2" y="2" width="12" height="12" fill="#38bdf8" stroke="#000080"/>
+        <rect x="5" y="4" width="4" height="3" fill="#22c55e"/>
+        <rect x="7" y="8" width="5" height="4" fill="#22c55e"/>
+      </g>
+      <g id="ico-check-16">
+        <rect x="1" y="1" width="14" height="14" fill="#ffffff" stroke="#808080"/>
+        <path d="M3 8l3 3 7-7" fill="none" stroke="#008000" stroke-width="2"/>
+      </g>
+    </defs>
+  </svg>
+
+  <div class="desktop" id="desktopArea">
+
+    <!-- Left Desktop Shortcut Icons -->
+    <aside class="desktop-icons" aria-label="Desktop Icons">
+      <button type="button" class="desk-icon active" data-open="win-main">
+        <svg width="32" height="32" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-wiz-16"/></svg>
+        <span>Try AI Demo</span>
+      </button>
+
+      <button type="button" class="desk-icon" data-open="win-portfolio">
+        <svg width="32" height="32" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-folder-16"/></svg>
+        <span>Portfolio</span>
+      </button>
+
+      <button type="button" class="desk-icon" data-open="win-geo">
+        <svg width="32" height="32" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-search-16"/></svg>
+        <span>AI Search GEO</span>
+      </button>
+
+      <button type="button" class="desk-icon" data-open="win-pricing">
+        <svg width="32" height="32" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-price-16"/></svg>
+        <span>Pricing</span>
+      </button>
+
+      <button type="button" class="desk-icon" data-open="win-pilot">
+        <svg width="32" height="32" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-mail-16"/></svg>
+        <span>Free Pilot</span>
+      </button>
+
+      <a class="desk-icon" href="/dashboard">
+        <svg width="32" height="32" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-gear-16"/></svg>
+        <span>Admin Panel</span>
+      </a>
+    </aside>
+
+    <!-- ================================================================= -->
+    <!-- WINDOW 1 (FIRST SCREEN): PASTE URL -> DEMO OR VIEW PORTFOLIO      -->
+    <!-- ================================================================= -->
+    <section id="win-main" class="win-window win-out active" data-label="Try AI Demo">
+      <div class="titlebar">
+        <div class="titlebar-left">
+          <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-wiz-16"/></svg>
+          <span>SiteMind AI 98 — Instant Website Demo &amp; Portfolio</span>
         </div>
-        <div class="min-w-0">
-          <div class="flex items-center gap-1.5">
-            <span class="font-headline-sm text-[17px] font-bold tracking-tight text-slate-900">SiteMind<span class="text-sky-600">AI</span></span>
-            <span class="hidden sm:inline-block px-1.5 py-0.5 rounded bg-sky-50 border border-sky-200 text-sky-700 font-label-code-sm text-[11px] font-medium">SaaS</span>
-          </div>
-          <p class="hidden md:block text-[11px] text-slate-500 truncate">AI-консультант с проверкой фактов</p>
+        <div class="title-controls">
+          <button type="button" class="ctrl-btn" data-action="min" title="Minimize"><svg width="8" height="9" viewBox="0 0 8 9" shape-rendering="crispEdges"><use href="#ico-min"/></svg></button>
+          <button type="button" class="ctrl-btn" data-action="max" title="Maximize"><svg width="9" height="9" viewBox="0 0 9 9" shape-rendering="crispEdges"><use href="#ico-max"/></svg></button>
+          <button type="button" class="ctrl-btn close-btn" data-action="close" title="Close"><svg width="8" height="7" viewBox="0 0 8 7" shape-rendering="crispEdges"><use href="#ico-close"/></svg></button>
         </div>
       </div>
 
-      <!-- Desktop Tabs -->
-      <nav class="hidden lg:flex items-center gap-1 p-1 rounded-xl bg-slate-100 border border-slate-200" aria-label="Разделы">
-        <button data-tab="overview" class="tab-btn active px-3 py-1.5 rounded-lg text-[12px] text-slate-600 hover:text-slate-900 transition-colors">Виджет</button>
-        <button data-tab="knowledge" class="tab-btn px-3 py-1.5 rounded-lg text-[12px] text-slate-600 hover:text-slate-900 transition-colors">База знаний</button>
-        <button data-tab="pricing" class="tab-btn px-3 py-1.5 rounded-lg text-[12px] text-slate-600 hover:text-slate-900 transition-colors">Live-цены</button>
-        <button data-tab="analytics" class="tab-btn px-3 py-1.5 rounded-lg text-[12px] text-slate-600 hover:text-slate-900 transition-colors">Аналитика</button>
+      <nav class="menubar">
+        <button type="button" class="menu-btn" data-open="win-main"><u>I</u>nstant Demo</button>
+        <button type="button" class="menu-btn" data-open="win-portfolio"><u>P</u>ortfolio</button>
+        <button type="button" class="menu-btn" data-open="win-geo"><u>G</u>EO Audit</button>
+        <button type="button" class="menu-btn" data-open="win-pricing">P<u>r</u>icing</button>
+        <button type="button" class="menu-btn" data-open="win-pilot"><u>F</u>ree Pilot</button>
       </nav>
 
-      <!-- Site Selector & Demo -->
-      <div class="flex items-center gap-2 shrink-0">
-        <select id="siteSelector" aria-label="Выбор сайта" class="text-[12px] font-medium bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-800 focus:border-sky-600 focus:ring-sky-600 max-w-[150px] sm:max-w-[190px]"></select>
-        <button id="openNewSiteBtn" title="Добавить сайт" class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[12px] font-semibold transition-colors shadow-sm">
-          <span class="material-symbols-outlined text-[16px]">add</span>
-          <span class="hidden sm:inline">Сайт</span>
-        </button>
-      </div>
-    </div>
+      <div class="win-content">
+        <!-- Short Clear Headline -->
+        <div>
+          <h1 style="margin:0 0 4px; font-size:18px; color:#000080;">
+            Test a 24/7 AI Assistant on Your Website in 1 Click
+          </h1>
+          <p style="margin:0; font-size:12px; color:#222222;">
+            Paste your website link below to build a live AI demo, or open a ready-made clinic example from our portfolio.
+          </p>
+        </div>
 
-    <!-- Mobile / Tablet Tabs -->
-    <div class="lg:hidden border-t border-slate-100 bg-slate-50 px-4 py-1.5 flex items-center gap-1 overflow-x-auto">
-      <button data-tab="overview" class="tab-btn active shrink-0 px-3 py-1 rounded-lg text-[12px] text-slate-600">Виджет</button>
-      <button data-tab="knowledge" class="tab-btn shrink-0 px-3 py-1 rounded-lg text-[12px] text-slate-600">База знаний</button>
-      <button data-tab="pricing" class="tab-btn shrink-0 px-3 py-1 rounded-lg text-[12px] text-slate-600">Live-цены</button>
-      <button data-tab="analytics" class="tab-btn shrink-0 px-3 py-1 rounded-lg text-[12px] text-slate-600">Аналитика</button>
-    </div>
-  </header>
-
-  <!-- Main Workspace -->
-  <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-5 flex-1">
-    <!-- Compact Site Status Bar -->
-    <div class="mb-5 rounded-xl bg-white border border-slate-200 shadow-sm px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center gap-2.5 flex-wrap">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-        <span id="siteHeaderName" class="font-headline-sm font-bold text-slate-900 text-[14px]">—</span>
-        <span id="siteHeaderDomain" class="font-label-code-sm text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600">—</span>
-        <span id="siteHeaderKey" class="hidden sm:inline-block font-label-code-sm text-[11px] px-2 py-0.5 rounded bg-sky-50 text-sky-700">—</span>
-      </div>
-      <a href="/demo.html" target="_blank" class="inline-flex items-center gap-1 text-[12px] text-sky-600 hover:text-sky-700 font-semibold">
-        <span>Демо-сайт с виджетом</span>
-        <span class="material-symbols-outlined text-[15px]">open_in_new</span>
-      </a>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-      <!-- Left 8 cols -->
-      <div class="lg:col-span-8 space-y-5">
-
-        <!-- TAB 1: OVERVIEW & WIDGET -->
-        <section id="tab-overview" class="tab-panel active space-y-4">
-          <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-5 space-y-3">
-            <div class="flex items-center justify-between">
-              <h2 class="font-headline-sm text-[16px] font-bold text-slate-900">Подключение одной строкой</h2>
-              <button id="copyScriptBtn" class="text-[12px] font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1">
-                <span class="material-symbols-outlined text-[15px]">content_copy</span> Копировать
-              </button>
-            </div>
-            <pre id="embedScriptCode" class="p-3 rounded-lg bg-slate-900 text-sky-300 font-label-code-sm text-[12px] overflow-x-auto"></pre>
-
-            <!-- Hidden alternatives -->
-            <details class="pt-1 border-t border-slate-100">
-              <summary class="text-[12px] font-medium text-slate-500 hover:text-sky-600 flex items-center gap-1 py-1">
-                <span class="material-symbols-outlined text-[16px]">expand_more</span>
-                Другие способы: iframe, REST API, React
-              </summary>
-              <div class="mt-2 space-y-2.5">
-                <div>
-                  <div class="text-[11px] font-medium text-slate-500 mb-1">iframe:</div>
-                  <pre id="embedIframeCode" class="p-2.5 rounded-lg bg-slate-100 text-slate-800 font-label-code-sm text-[11px] overflow-x-auto"></pre>
-                </div>
-                <div>
-                  <div class="text-[11px] font-medium text-slate-500 mb-1">React-компонент:</div>
-                  <pre id="embedReactCode" class="p-2.5 rounded-lg bg-slate-100 text-slate-800 font-label-code-sm text-[11px] overflow-x-auto"></pre>
-                </div>
-                <div>
-                  <div class="text-[11px] font-medium text-slate-500 mb-1">REST API:</div>
-                  <pre id="embedApiCode" class="p-2.5 rounded-lg bg-slate-100 text-slate-800 font-label-code-sm text-[11px] overflow-x-auto"></pre>
-                </div>
-              </div>
-            </details>
-          </div>
-
-          <!-- Simplified Widget Settings -->
-          <form id="siteSettingsForm" class="rounded-xl bg-white border border-slate-200 shadow-sm p-5 space-y-4">
-            <div class="flex items-center justify-between">
-              <h2 class="font-headline-sm text-[16px] font-bold text-slate-900">Настройка виджета</h2>
-              <span id="settingsSavedBadge" class="hidden text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">Сохранено</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div class="sm:col-span-2">
-                <label class="block text-[12px] font-medium text-slate-700 mb-1">Заголовок</label>
-                <input id="cfgTitle" type="text" class="w-full rounded-lg border-slate-200 text-[13px]" />
-              </div>
-              <div>
-                <label class="block text-[12px] font-medium text-slate-700 mb-1">Язык</label>
-                <select id="cfgLang" class="w-full rounded-lg border-slate-200 text-[13px]">
-                  <option value="uk">Українська (UK)</option>
-                  <option value="en">English (EN)</option>
-                  <option value="ru">Русский (RU)</option>
-                </select>
-              </div>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
-              <div class="sm:col-span-2">
-                <label class="block text-[12px] font-medium text-slate-700 mb-1">Приветствие</label>
-                <input id="cfgWelcome" type="text" class="w-full rounded-lg border-slate-200 text-[13px]" />
-              </div>
-              <div>
-                <label class="block text-[12px] font-medium text-slate-700 mb-1">Акцент</label>
-                <input id="cfgColor" type="color" class="w-full h-[38px] rounded-lg border-slate-200 p-1 cursor-pointer" />
-              </div>
-              <div>
-                <label class="block text-[12px] font-medium text-slate-700 mb-1">Фон</label>
-                <input id="cfgBg" type="color" class="w-full h-[38px] rounded-lg border-slate-200 p-1 cursor-pointer" />
-              </div>
-            </div>
-
-            <!-- Shape & Avatar customization -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
-              <div>
-                <label class="block text-[12px] font-medium text-slate-700 mb-1">Форма виджета</label>
-                <select id="cfgShape" class="w-full rounded-lg border-slate-200 text-[13px]">
-                  <option value="rounded">Округлый (по умолчанию)</option>
-                  <option value="sharp">Строгий прямоугольный</option>
-                  <option value="pill">Мягкий (Pill)</option>
-                </select>
-              </div>
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="block text-[12px] font-medium text-slate-700">Аватарка (URL или эмодзи)</label>
-                  <div class="flex gap-1">
-                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="🤖">🤖</button>
-                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="⚡">⚡</button>
-                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="✨">✨</button>
-                    <button type="button" class="avatar-preset text-[12px] px-1.5 rounded bg-slate-100 hover:bg-sky-50" data-av="💬">💬</button>
-                  </div>
-                </div>
-                <input id="cfgAvatar" type="text" placeholder="https://... или эмодзи 🤖" class="w-full rounded-lg border-slate-200 text-[13px]" />
-              </div>
-            </div>
-
-            <!-- Advanced Agent Settings hidden in accordion -->
-            <details class="pt-1 border-t border-slate-100">
-              <summary class="text-[12px] font-medium text-slate-500 hover:text-sky-600 flex items-center gap-1 py-1">
-                <span class="material-symbols-outlined text-[16px]">tune</span>
-                Расширенные настройки (положение, промпт, строгий режим)
-              </summary>
-              <div class="mt-3 space-y-3">
-                <div>
-                  <label class="block text-[12px] font-medium text-slate-700 mb-1">Положение на странице</label>
-                  <select id="cfgPos" class="w-full sm:w-48 rounded-lg border-slate-200 text-[13px]">
-                    <option value="bottom-right">Справа внизу</option>
-                    <option value="bottom-left">Слева внизу</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-[12px] font-medium text-slate-700 mb-1">Системные инструкции</label>
-                  <textarea id="cfgPrompt" rows="2" class="w-full rounded-lg border-slate-200 text-[13px]"></textarea>
-                </div>
-                <label class="inline-flex items-center gap-2 text-[12px] text-slate-700 cursor-pointer">
-                  <input id="cfgStrict" type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-600" />
-                  <span>Строгий режим (запретить домыслы при отсутствии фактов)</span>
-                </label>
-
-                <div class="pt-2 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">LLM-провайдер</label>
-                    <select id="cfgLlmProvider" class="w-full rounded-lg border-slate-200 text-[12px]">
-                      <option value="local">Local (встроенный, 0 ₴)</option>
-                      <option value="gemini">Google Gemini</option>
-                      <option value="openai">OpenAI / Compatible</option>
-                      <option value="ollama">Ollama (локально)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">Модель (опционально)</label>
-                    <input id="cfgLlmModel" type="text" placeholder="gemini-2.5-flash / llama3.1" class="w-full rounded-lg border-slate-200 text-[12px]" />
-                  </div>
-                  <div>
-                    <label class="block text-[11px] font-medium text-slate-600 mb-1">API-ключ провайдера</label>
-                    <input id="cfgLlmKey" type="password" placeholder="Оставьте пустым, если сохранён" class="w-full rounded-lg border-slate-200 text-[12px]" />
-                  </div>
-                </div>
-              </div>
-            </details>
-
-            <div class="flex justify-end">
-              <button type="submit" class="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[13px] font-semibold shadow-sm transition-colors">
-                Сохранить
-              </button>
-            </div>
+        <!-- STEP 1: PASTE YOUR WEBSITE URL FORM (Primary Action) -->
+        <fieldset class="groupbox">
+          <legend>1. Build a Live Demo From Your Website URL</legend>
+          <form id="quickstartForm" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <input class="win-input" id="qsUrl" type="text" placeholder="https://yourwebsite.com" style="flex:1; min-width:220px;" required />
+            <button type="submit" class="win-btn default-btn" id="qsSubmitBtn">
+              <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-globe-16"/></svg>
+              <span>Create My Live Demo</span>
+            </button>
           </form>
-        </section>
 
-        <!-- TAB 2: KNOWLEDGE BASE (RAG) -->
-        <section id="tab-knowledge" class="tab-panel space-y-4">
-          <!-- Collapsible Add Knowledge Panel -->
-          <details class="rounded-xl bg-white border border-slate-200 shadow-sm p-4" open>
-            <summary class="font-headline-sm text-[15px] font-bold text-slate-900 flex items-center justify-between">
-              <span class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-sky-600 text-[20px]">add_circle</span>
-                Добавить знания (Файл, Текст, URL или FAQ)
-              </span>
-              <span class="text-[11px] font-normal text-slate-400">нажмите, чтобы свернуть</span>
-            </summary>
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
-              <div class="space-y-3">
-                <form id="uploadFileForm" class="flex items-center gap-2">
-                  <input id="kbFileInput" type="file" accept=".txt,.csv,.json,.md,.pdf" class="block w-full text-[12px] text-slate-600 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border file:border-slate-200 file:text-[12px] file:font-semibold file:bg-slate-50" />
-                  <button type="submit" class="shrink-0 px-3 py-1.5 rounded-lg bg-sky-600 text-white text-[12px] font-semibold">Файл</button>
-                </form>
-                <form id="addTextDocForm" class="space-y-2">
-                  <input id="kbTextTitle" type="text" placeholder="Название документа..." class="w-full rounded-lg border-slate-200 text-[12px]" required />
-                  <textarea id="kbTextContent" rows="2" placeholder="Текст для RAG-поиска..." class="w-full rounded-lg border-slate-200 text-[12px]" required></textarea>
-                  <button type="submit" class="w-full py-1.5 rounded-lg bg-slate-900 text-white text-[12px] font-semibold">Добавить текст</button>
-                </form>
-              </div>
-              <div class="space-y-3">
-                <form id="addUrlForm" class="space-y-2">
-                  <div class="flex gap-2">
-                    <input id="kbUrlInput" type="url" placeholder="https://site.com/page" class="flex-1 rounded-lg border-slate-200 text-[12px]" required />
-                    <button type="submit" class="px-3 py-1.5 rounded-lg bg-sky-600 text-white text-[12px] font-semibold">URL</button>
-                  </div>
-                  <label class="inline-flex items-center gap-1.5 text-[11px] text-slate-500 cursor-pointer">
-                    <input id="kbCrawlMode" type="checkbox" class="rounded border-slate-300 text-sky-600" />
-                    <span>Авто-краулер (обойти sitemap / ссылки до 8 страниц)</span>
-                  </label>
-                </form>
-                <form id="addFaqForm" class="space-y-2">
-                  <input id="faqQuestion" type="text" placeholder="Частый вопрос (FAQ)..." class="w-full rounded-lg border-slate-200 text-[12px]" required />
-                  <textarea id="faqAnswer" rows="2" placeholder="Точный готовый ответ (0 токенов)..." class="w-full rounded-lg border-slate-200 text-[12px]" required></textarea>
-                  <button type="submit" class="w-full py-1.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-700 text-[12px] font-semibold">Добавить FAQ</button>
-                </form>
-              </div>
-            </div>
-          </details>
-
-          <!-- Indexed Docs -->
-          <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-5">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-headline-sm text-[15px] font-bold text-slate-900">Документы и страницы</h3>
-              <div class="flex items-center gap-2">
-                <button id="syncAllUrlsBtn" type="button" class="text-[11px] font-semibold text-sky-600 hover:text-sky-700 flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[14px]">sync</span> Обновить URL
-                </button>
-                <span id="docsCountBadge" class="font-label-code-sm text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600">0</span>
-              </div>
-            </div>
-            <div id="docsList" class="space-y-2"></div>
-          </div>
-
-          <!-- FAQs -->
-          <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-5">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-headline-sm text-[15px] font-bold text-slate-900">Готовые FAQ (без вызова LLM)</h3>
-              <span id="faqsCountBadge" class="font-label-code-sm text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600">0</span>
-            </div>
-            <div id="faqsList" class="space-y-2"></div>
-          </div>
-        </section>
-
-        <!-- TAB 3: LIVE PRICING & API -->
-        <section id="tab-pricing" class="tab-panel space-y-4">
-          <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-5 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h2 class="font-headline-sm text-[16px] font-bold text-slate-900">Live-каталог товаров и цен</h2>
-              <label class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-red-50 border border-red-200 text-red-800 text-[12px] font-medium cursor-pointer">
-                <input id="simulateOfflineToggle" type="checkbox" class="rounded border-red-300 text-red-600 focus:ring-red-600" />
-                <span>Тест сбоя API цен</span>
-              </label>
-            </div>
-
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase">
-                    <th class="py-2 pr-3">SKU</th>
-                    <th class="py-2 pr-3">Товар / Услуга</th>
-                    <th class="py-2 pr-3">Цена (€ / ₴)</th>
-                    <th class="py-2 pr-3">Остаток</th>
-                    <th class="py-2 text-right">Действия</th>
-                  </tr>
-                </thead>
-                <tbody id="productsTableBody" class="divide-y divide-slate-100 text-[13px]"></tbody>
-              </table>
-            </div>
-
-            <!-- Collapsible Add Product & External API -->
-            <details class="pt-2 border-t border-slate-100">
-              <summary class="text-[12px] font-medium text-sky-600 hover:text-sky-700 flex items-center gap-1 py-1">
-                <span class="material-symbols-outlined text-[16px]">add</span>
-                Добавить товар или подключить внешний JSON API
-              </summary>
-              <div class="mt-3 space-y-3">
-                <form id="addProductForm" class="grid grid-cols-1 sm:grid-cols-6 gap-2">
-                  <input id="prodSku" type="text" placeholder="SKU" class="sm:col-span-1 rounded-lg border-slate-200 text-[12px] font-label-code-sm" required />
-                  <input id="prodName" type="text" placeholder="Название" class="sm:col-span-2 rounded-lg border-slate-200 text-[12px]" required />
-                  <input id="prodPrice" type="number" step="0.01" placeholder="Цена" class="sm:col-span-1 rounded-lg border-slate-200 text-[12px] font-label-numeric" required />
-                  <input id="prodStock" type="number" placeholder="Остаток" value="10" class="sm:col-span-1 rounded-lg border-slate-200 text-[12px] font-label-numeric" required />
-                  <button type="submit" class="sm:col-span-1 rounded-lg bg-sky-600 text-white text-[12px] font-semibold py-1.5">Добавить</button>
-                </form>
-                <form id="priceApiForm" class="flex flex-col sm:flex-row gap-2">
-                  <input id="priceApiUrlInput" type="text" placeholder="Внешний JSON API URL (пусто = встроенная Live БД)" class="flex-1 rounded-lg border-slate-200 text-[12px] font-label-code-sm" />
-                  <button type="submit" class="px-4 py-1.5 rounded-lg bg-slate-800 text-white text-[12px] font-semibold">Сохранить URL</button>
-                </form>
-              </div>
-            </details>
-          </div>
-        </section>
-
-        <!-- TAB 4: DIALOGS & ANALYTICS -->
-        <section id="tab-analytics" class="tab-panel space-y-4">
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div class="rounded-xl bg-white border border-slate-200 p-4 shadow-sm">
-              <div class="text-[11px] text-slate-500 font-medium">Диалоги</div>
-              <div id="kpiDialogs" class="font-label-numeric text-[22px] font-bold text-slate-900 mt-1">0</div>
-            </div>
-            <div class="rounded-xl bg-white border border-slate-200 p-4 shadow-sm">
-              <div class="text-[11px] text-slate-500 font-medium">Конверсии (Заказы)</div>
-              <div id="kpiConversions" class="font-label-numeric text-[22px] font-bold text-emerald-600 mt-1">0</div>
-            </div>
-            <div class="rounded-xl bg-white border border-slate-200 p-4 shadow-sm">
-              <div class="text-[11px] text-slate-500 font-medium">Экономия (Кэш+FAQ)</div>
-              <div id="kpiSavings" class="font-label-numeric text-[22px] font-bold text-sky-600 mt-1">0%</div>
-            </div>
-            <div class="rounded-xl bg-white border border-slate-200 p-4 shadow-sm">
-              <div class="text-[11px] text-slate-500 font-medium">Токены / Без ответа</div>
-              <div class="flex items-baseline gap-2 mt-1">
-                <span id="kpiTokens" class="font-label-numeric text-[15px] font-bold text-slate-900">0</span>
-                <span class="text-slate-300">/</span>
-                <span id="kpiUnanswered" class="font-label-numeric text-[16px] font-bold text-amber-600">0</span>
-              </div>
+          <!-- Progress Bar -->
+          <div id="qsProgressWrap" style="display:none; margin-top:8px;">
+            <div id="qsStatusText" style="font-size:11px; margin-bottom:3px;">Scanning website pages...</div>
+            <div class="progress-box win-in">
+              <div class="progress-bar" id="qsProgressFill"></div>
             </div>
           </div>
 
-          <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-5">
-            <h3 class="font-headline-sm text-[15px] font-bold text-slate-900 mb-3">Вопросы без ответа</h3>
-            <div id="unansweredList" class="space-y-2"></div>
-          </div>
+          <div id="qsErrorBox" class="win-in" style="display:none; margin-top:8px; padding:6px 8px; background:#fff0f0; color:#990000;"></div>
 
-          <div class="rounded-xl bg-white border border-slate-200 shadow-sm p-5">
-            <h3 class="font-headline-sm text-[15px] font-bold text-slate-900 mb-3">История диалогов</h3>
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-              <div id="dialogsList" class="md:col-span-5 space-y-2 max-h-[300px] overflow-y-auto"></div>
-              <div id="dialogDetail" class="md:col-span-7 rounded-lg bg-slate-50 border border-slate-200 p-3 min-h-[180px] max-h-[300px] overflow-y-auto text-[12px] text-slate-600">
-                Выберите диалог слева.
+          <!-- Instant Result Box (Appears right here after submit or preset click) -->
+          <div id="qsResultBox" style="display:none; margin-top:8px;">
+            <div class="win-in" style="padding:8px 10px; background:#fffff0; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap;">
+              <div>
+                <strong id="qsResultMeta" style="color:#006600; display:block;">Your Live AI Demo is Ready!</strong>
+                <span class="mono" id="qsCodeOut" style="font-size:11px; color:#000080;"></span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <button type="button" class="win-btn" id="qsCopyBtn">Copy 1-Line Code</button>
+                <a class="win-btn default-btn" id="qsPreviewLink" href="/preview.html">Open Live Demo Page</a>
               </div>
             </div>
           </div>
-        </section>
+        </fieldset>
 
+        <!-- STEP 2: OR OPEN READY-MADE PORTFOLIO EXAMPLES -->
+        <fieldset class="groupbox">
+          <legend>2. Or Open a Ready-Made Portfolio Example</legend>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 0.85fr; gap:8px;">
+            <div class="win-in" style="padding:9px 10px; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
+              <div>
+                <strong style="color:#000080; display:block;">Cosmetic Dental Clinic (Miami)</strong>
+                <span style="font-size:11px; color:#333333;">Veneers, implants, 0% financing &amp; AI search.</span>
+              </div>
+              <a href="/demo-dental.html" class="win-btn default-btn">Open Dental Demo</a>
+            </div>
+
+            <div class="win-in" style="padding:9px 10px; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
+              <div>
+                <strong style="color:#000080; display:block;">Aesthetic MedSpa (Midtown NYC)</strong>
+                <span style="font-size:11px; color:#333333;">Morpheus8, Botox, fillers &amp; 24/7 booking.</span>
+              </div>
+              <a href="/demo-medspa.html" class="win-btn default-btn">Open MedSpa Demo</a>
+            </div>
+
+            <div class="win-in" style="padding:9px 10px; display:flex; flex-direction:column; justify-content:space-between; gap:8px; background:#f8fafc;">
+              <div>
+                <strong style="color:#000000; display:block;">More Cases &amp; Pricing</strong>
+                <span style="font-size:11px; color:#333333;">See GEO audit results &amp; plans.</span>
+              </div>
+              <button type="button" class="win-btn" data-open="win-portfolio">View All Portfolio</button>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="statusbar">
+          <div class="status-pane win-sunken-gray" style="flex:1;">1-Line Install · Works on WordPress, Webflow, Squarespace &amp; Shopify</div>
+          <div class="status-pane win-sunken-gray mono">fatherreflex.art · 24/7 AI Online</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- WINDOW 2: PORTFOLIO & CASE STUDIES                                -->
+    <!-- ================================================================= -->
+    <section id="win-portfolio" class="win-window win-out" data-label="Portfolio">
+      <div class="titlebar">
+        <div class="titlebar-left">
+          <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-folder-16"/></svg>
+          <span>Portfolio — Ready-Made AI &amp; GEO Solutions</span>
+        </div>
+        <div class="title-controls">
+          <button type="button" class="ctrl-btn" data-action="min" title="Minimize"><svg width="8" height="9" viewBox="0 0 8 9" shape-rendering="crispEdges"><use href="#ico-min"/></svg></button>
+          <button type="button" class="ctrl-btn" data-action="max" title="Maximize"><svg width="9" height="9" viewBox="0 0 9 9" shape-rendering="crispEdges"><use href="#ico-max"/></svg></button>
+          <button type="button" class="ctrl-btn close-btn" data-action="close" title="Close"><svg width="8" height="7" viewBox="0 0 8 7" shape-rendering="crispEdges"><use href="#ico-close"/></svg></button>
+        </div>
       </div>
 
-      <!-- Right 4 cols: Live Interactive Chat Sandbox -->
-      <aside id="previewAside" class="lg:col-span-4 rounded-xl bg-white border border-slate-200 shadow-sm overflow-hidden flex flex-col lg:sticky lg:top-20" style="height: 580px;">
-        <div id="previewHeader" class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <div id="previewAvatar" class="w-8 h-8 rounded-full bg-sky-600 text-white flex items-center justify-center text-[15px] overflow-hidden shrink-0">🤖</div>
+      <div class="win-content">
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px;">
+          <fieldset class="groupbox" style="display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+            <legend>Case 1: Dental Clinic</legend>
+            <div class="win-in" style="padding:10px;">
+              <strong style="display:block; color:#000080; margin-bottom:4px;">Aurelia Dental (Miami)</strong>
+              <div style="font-size:11px; color:#333333; line-height:1.45;">
+                24/7 AI Concierge + Smart Search for veneers ($1,450), implants ($18,500) &amp; 0% financing.
+              </div>
+            </div>
+            <a href="/demo-dental.html" class="win-btn default-btn">Open Live Site</a>
+          </fieldset>
+
+          <fieldset class="groupbox" style="display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+            <legend>Case 2: MedSpa Studio</legend>
+            <div class="win-in" style="padding:10px;">
+              <strong style="display:block; color:#000080; margin-bottom:4px;">Lumiere MedSpa (NYC)</strong>
+              <div style="font-size:11px; color:#333333; line-height:1.45;">
+                Instant answers on Morpheus8 downtime, Botox ($14/u), fillers &amp; late-night booking.
+              </div>
+            </div>
+            <a href="/demo-medspa.html" class="win-btn default-btn">Open Live Site</a>
+          </fieldset>
+
+          <fieldset class="groupbox" style="display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+            <legend>Case 3: E-Commerce &amp; Admin</legend>
+            <div class="win-in" style="padding:10px;">
+              <strong style="display:block; color:#000080; margin-bottom:4px;">SiteMind Control Panel</strong>
+              <div style="font-size:11px; color:#333333; line-height:1.45;">
+                Manage multiple client sites, upload PDF price lists, and inspect live dialogs.
+              </div>
+            </div>
+            <a href="/dashboard" class="win-btn">Open Control Panel</a>
+          </fieldset>
+        </div>
+
+        <div class="statusbar">
+          <div class="status-pane win-sunken-gray" style="flex:1;">Click any demo above to test the live AI widget and Smart Search</div>
+          <button type="button" class="win-btn" data-open="win-main">&lt; Back to URL Demo</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- WINDOW 3: AI SEARCH & GEO AUDIT                                   -->
+    <!-- ================================================================= -->
+    <section id="win-geo" class="win-window win-out" data-label="AI Search GEO">
+      <div class="titlebar">
+        <div class="titlebar-left">
+          <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-search-16"/></svg>
+          <span>AI Search GEO — Get Recommended by ChatGPT &amp; Perplexity</span>
+        </div>
+        <div class="title-controls">
+          <button type="button" class="ctrl-btn" data-action="min" title="Minimize"><svg width="8" height="9" viewBox="0 0 8 9" shape-rendering="crispEdges"><use href="#ico-min"/></svg></button>
+          <button type="button" class="ctrl-btn" data-action="max" title="Maximize"><svg width="9" height="9" viewBox="0 0 9 9" shape-rendering="crispEdges"><use href="#ico-max"/></svg></button>
+          <button type="button" class="ctrl-btn close-btn" data-action="close" title="Close"><svg width="8" height="7" viewBox="0 0 8 7" shape-rendering="crispEdges"><use href="#ico-close"/></svg></button>
+        </div>
+      </div>
+
+      <div class="win-content">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <fieldset class="groupbox">
+            <legend>Before GEO Setup</legend>
+            <div class="win-in mono" style="padding:10px; font-size:11px; line-height:1.6;">
+              Search: "Best clinic in [Your City]"<br/>
+              1. Competitor A (Recommended)<br/>
+              2. Competitor B (Recommended)<br/>
+              <strong style="color:#990000;">Your Website: NOT LISTED</strong>
+            </div>
+          </fieldset>
+
+          <fieldset class="groupbox">
+            <legend>After SiteMind GEO Setup</legend>
+            <div class="win-in mono" style="padding:10px; font-size:11px; line-height:1.6;">
+              Search: "Best clinic in [Your City]"<br/>
+              <strong style="color:#008000;">1. Your Website (#1 Recommended)</strong><br/>
+              + Schema.org JSON-LD Markup<br/>
+              + /llms.txt + AI FAQ Structure
+            </div>
+          </fieldset>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+          <button type="button" class="win-btn" data-open="win-main">&lt; Back</button>
+          <button type="button" class="win-btn default-btn" data-open="win-pilot">Get Free GEO Audit</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- WINDOW 4: PRICING                                                 -->
+    <!-- ================================================================= -->
+    <section id="win-pricing" class="win-window win-out" data-label="Pricing">
+      <div class="titlebar">
+        <div class="titlebar-left">
+          <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-price-16"/></svg>
+          <span>Pricing &amp; Packages</span>
+        </div>
+        <div class="title-controls">
+          <button type="button" class="ctrl-btn" data-action="min" title="Minimize"><svg width="8" height="9" viewBox="0 0 8 9" shape-rendering="crispEdges"><use href="#ico-min"/></svg></button>
+          <button type="button" class="ctrl-btn" data-action="max" title="Maximize"><svg width="9" height="9" viewBox="0 0 9 9" shape-rendering="crispEdges"><use href="#ico-max"/></svg></button>
+          <button type="button" class="ctrl-btn close-btn" data-action="close" title="Close"><svg width="8" height="7" viewBox="0 0 8 7" shape-rendering="crispEdges"><use href="#ico-close"/></svg></button>
+        </div>
+      </div>
+
+      <div class="win-content">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <fieldset class="groupbox" style="display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+            <legend>24/7 AI Assistant + Smart Search</legend>
+            <div class="win-in" style="padding:10px;">
+              <div class="mono" style="font-size:17px; font-weight:700; color:#000080;">$950 setup + $290/mo</div>
+              <ul style="margin:8px 0 0; padding-left:16px; font-size:11px; line-height:1.5;">
+                <li>24/7 AI Concierge trained on your site</li>
+                <li>Smart semantic search bar</li>
+                <li>1-line install on any CMS</li>
+              </ul>
+            </div>
+            <button type="button" class="win-btn" data-pilot-plan="AI Concierge ($950 + $290/mo)">Start 7-Day Pilot</button>
+          </fieldset>
+
+          <fieldset class="groupbox" style="display:flex; flex-direction:column; justify-content:space-between; gap:10px;">
+            <legend>Full AI + ChatGPT/Perplexity GEO</legend>
+            <div class="win-in" style="padding:10px; background:#fffff0;">
+              <div class="mono" style="font-size:17px; font-weight:700; color:#000080;">$1,650 setup + $450/mo</div>
+              <ul style="margin:8px 0 0; padding-left:16px; font-size:11px; line-height:1.5;">
+                <li>Everything in 24/7 AI Assistant</li>
+                <li>Schema.org + /llms.txt GEO setup</li>
+                <li>ChatGPT &amp; Perplexity ranking optimization</li>
+              </ul>
+            </div>
+            <button type="button" class="win-btn default-btn" data-pilot-plan="Full AI + GEO Growth ($1,650 + $450/mo)">Start 7-Day Free Pilot</button>
+          </fieldset>
+        </div>
+
+        <div class="statusbar">
+          <div class="status-pane win-sunken-gray" style="flex:1;">7-day free pilot before you pay.</div>
+          <button type="button" class="win-btn" data-open="win-main">&lt; Back</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- WINDOW 5: BOOK 7-DAY FREE PILOT                                   -->
+    <!-- ================================================================= -->
+    <section id="win-pilot" class="win-window win-out" data-label="Free Pilot" style="max-width: 520px;">
+      <div class="titlebar">
+        <div class="titlebar-left">
+          <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-mail-16"/></svg>
+          <span>Request 7-Day Free Pilot</span>
+        </div>
+        <div class="title-controls">
+          <button type="button" class="ctrl-btn" data-action="min" title="Minimize"><svg width="8" height="9" viewBox="0 0 8 9" shape-rendering="crispEdges"><use href="#ico-min"/></svg></button>
+          <button type="button" class="ctrl-btn" data-action="max" title="Maximize"><svg width="9" height="9" viewBox="0 0 9 9" shape-rendering="crispEdges"><use href="#ico-max"/></svg></button>
+          <button type="button" class="ctrl-btn close-btn" data-action="close" title="Close"><svg width="8" height="7" viewBox="0 0 8 7" shape-rendering="crispEdges"><use href="#ico-close"/></svg></button>
+        </div>
+      </div>
+
+      <div class="win-content">
+        <form id="pilotForm" style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
             <div>
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <div id="previewTitle" class="font-headline-sm text-[14px] font-bold text-slate-900">AI-Консультант</div>
-              </div>
-              <div class="text-[11px] text-slate-500">Проверка работы агента</div>
+              <label style="display:block; font-weight:700; margin-bottom:3px;" for="leadName">Your Name *</label>
+              <input class="win-input" id="leadName" type="text" placeholder="Dr. Sarah Jenkins" required />
+            </div>
+            <div>
+              <label style="display:block; font-weight:700; margin-bottom:3px;" for="leadEmail">Work Email *</label>
+              <input class="win-input" id="leadEmail" type="email" placeholder="doctor@clinic.com" required />
             </div>
           </div>
-          <button id="resetChatBtn" class="text-[11px] font-label-code-sm px-2 py-1 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900">Сброс</button>
-        </div>
 
-        <div class="px-3 py-2 bg-white border-b border-slate-100 flex flex-wrap gap-1.5">
-          <button type="button" class="quick-q text-[11px] px-2 py-1 rounded-md bg-sky-50 border border-sky-200 text-sky-700 hover:bg-sky-100" data-q="Сколько стоит NordicBook Pro 14?">Цена ноутбука</button>
-          <button type="button" class="quick-q text-[11px] px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200" data-q="Какие способы оплаты доступны?">Оплата (FAQ)</button>
-          <button type="button" class="quick-q text-[11px] px-2 py-1 rounded-md bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200" data-q="Оформить заказ на NT-LAP-14">Заказ</button>
-        </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <div>
+              <label style="display:block; font-weight:700; margin-bottom:3px;" for="leadUrl">Website URL</label>
+              <input class="win-input" id="leadUrl" type="text" placeholder="https://yourclinic.com" />
+            </div>
+            <div>
+              <label style="display:block; font-weight:700; margin-bottom:3px;" for="leadPlan">Package</label>
+              <select class="win-select" id="leadPlan">
+                <option value="7-Day Free Pilot">7-Day Free Pilot</option>
+                <option value="AI Concierge ($950 + $290/mo)">AI Concierge ($950 + $290/mo)</option>
+                <option value="Full AI + GEO Growth ($1,650 + $450/mo)">Full AI + GEO Growth ($1,650 + $450/mo)</option>
+              </select>
+            </div>
+          </div>
 
-        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 bg-slate-50 space-y-3"></div>
+          <div id="pilotSuccessBox" class="win-in" style="display:none; padding:8px; background:#f0fff0; color:#006600;"></div>
+          <div id="pilotErrorBox" class="win-in" style="display:none; padding:8px; background:#fff0f0; color:#990000;"></div>
 
-        <form id="chatForm" class="p-3 bg-white border-t border-slate-200 flex gap-2">
-          <input id="chatInput" type="text" placeholder="Задайте вопрос консультанту..." class="flex-1 rounded-lg border-slate-200 text-[13px] focus:border-sky-600 focus:ring-sky-600" autocomplete="off" />
-          <button id="chatSendBtn" type="submit" class="px-3.5 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[13px] font-semibold transition-colors">
-            <span class="material-symbols-outlined text-[18px] align-middle">send</span>
-          </button>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:4px;">
+            <a href="mailto:my.mykola.po@gmail.com" style="color:#000080; font-size:11px;">my.mykola.po@gmail.com</a>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="win-btn" data-open="win-main">Cancel</button>
+              <button type="submit" class="win-btn default-btn">Send Request</button>
+            </div>
+          </div>
         </form>
-      </aside>
-    </div>
-  </main>
-
-  <!-- New Site Modal -->
-  <div id="newSiteModal" class="hidden fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl border border-slate-200 shadow-xl max-w-md w-full p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="font-headline-sm text-[16px] font-bold text-slate-900">Подключить новый сайт</h3>
-        <button id="closeNewSiteBtn" class="text-slate-400 hover:text-slate-700 text-xl leading-none">×</button>
       </div>
-      <form id="newSiteForm" class="space-y-3">
-        <div>
-          <label class="block text-[12px] font-medium text-slate-700 mb-1">Название проекта</label>
-          <input id="newSiteName" type="text" placeholder="Например: CoffeeRoast Shop" class="w-full rounded-lg border-slate-200 text-[13px]" required />
-        </div>
-        <div>
-          <label class="block text-[12px] font-medium text-slate-700 mb-1">Домен сайта</label>
-          <input id="newSiteDomain" type="text" placeholder="coffeeroast.example.com" class="w-full rounded-lg border-slate-200 text-[13px]" required />
-        </div>
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" id="cancelNewSiteBtn" class="px-3 py-1.5 rounded-lg border border-slate-200 text-[12px] font-semibold text-slate-600">Отмена</button>
-          <button type="submit" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[12px] font-semibold">Создать</button>
-        </div>
-      </form>
+    </section>
+
+  </div>
+
+  <!-- START MENU -->
+  <div id="startMenu" class="start-menu win-out" role="menu">
+    <div class="start-sidebar">Windows 98</div>
+    <div class="start-list">
+      <button type="button" class="start-item" data-open="win-main">
+        <svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-wiz-16"/></svg>
+        <strong>Try Live URL Demo</strong>
+      </button>
+      <button type="button" class="start-item" data-open="win-portfolio">
+        <svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-folder-16"/></svg>
+        <span>Portfolio &amp; Cases</span>
+      </button>
+      <button type="button" class="start-item" data-open="win-geo">
+        <svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-search-16"/></svg>
+        <span>AI Search GEO</span>
+      </button>
+      <button type="button" class="start-item" data-open="win-pricing">
+        <svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-price-16"/></svg>
+        <span>Pricing</span>
+      </button>
+      <div class="start-hr"></div>
+      <button type="button" class="start-item" data-open="win-pilot">
+        <svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-mail-16"/></svg>
+        <span>7-Day Free Pilot</span>
+      </button>
+      <a class="start-item" href="/dashboard">
+        <svg width="16" height="16" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-gear-16"/></svg>
+        <span>Admin Panel</span>
+      </a>
     </div>
   </div>
 
-  <script src="/app.js"></script>
+  <!-- TASKBAR -->
+  <footer class="taskbar">
+    <button type="button" id="startBtn" class="win-btn start-btn">
+      <svg width="16" height="14" viewBox="0 0 16 14" shape-rendering="crispEdges">
+        <rect x="1" y="1" width="6" height="5" fill="#ff0000"/>
+        <rect x="8" y="1" width="6" height="5" fill="#00aa00"/>
+        <rect x="1" y="7" width="6" height="5" fill="#0000ff"/>
+        <rect x="8" y="7" width="6" height="5" fill="#ffcc00"/>
+      </svg>
+      <span>Start</span>
+    </button>
+
+    <div class="taskbar-divider"></div>
+
+    <div class="task-tabs" id="taskTabs">
+      <button type="button" class="task-tab active" data-open="win-main">
+        <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-wiz-16"/></svg>
+        <span>Try AI Demo</span>
+      </button>
+      <button type="button" class="task-tab" data-open="win-portfolio">
+        <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-folder-16"/></svg>
+        <span>Portfolio</span>
+      </button>
+      <button type="button" class="task-tab" data-open="win-geo">
+        <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-search-16"/></svg>
+        <span>AI Search GEO</span>
+      </button>
+      <button type="button" class="task-tab" data-open="win-pricing">
+        <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-price-16"/></svg>
+        <span>Pricing</span>
+      </button>
+      <button type="button" class="task-tab" data-open="win-pilot">
+        <svg width="14" height="14" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-mail-16"/></svg>
+        <span>Free Pilot</span>
+      </button>
+    </div>
+
+    <div class="tray win-sunken-gray mono">
+      <svg width="12" height="12" viewBox="0 0 16 16" shape-rendering="crispEdges"><use href="#ico-check-16"/></svg>
+      <span id="winClock">12:00 PM</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const origin = window.location.origin;
+
+      function updateClock() {
+        const el = document.getElementById('winClock');
+        if (el) el.textContent = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      }
+      updateClock();
+      setInterval(updateClock, 15000);
+
+      // Single-Window Switcher (Only 1 window visible on screen at a time)
+      function openWindow(winId) {
+        document.querySelectorAll('.win-window').forEach((w) => {
+          w.classList.toggle('active', w.id === winId);
+        });
+        document.querySelectorAll('.desk-icon[data-open]').forEach((i) => {
+          i.classList.toggle('active', i.dataset.open === winId);
+        });
+        document.querySelectorAll('.task-tab[data-open]').forEach((t) => {
+          t.classList.toggle('active', t.dataset.open === winId);
+        });
+        closeStartMenu();
+      }
+
+      document.querySelectorAll('[data-open]').forEach((el) => {
+        el.addEventListener('click', () => openWindow(el.dataset.open));
+      });
+
+      document.querySelectorAll('[data-pilot-plan]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const sel = document.getElementById('leadPlan');
+          if (sel) sel.value = btn.dataset.pilotPlan;
+          openWindow('win-pilot');
+        });
+      });
+
+      // Titlebar Minimize / Maximize / Close controls
+      document.querySelectorAll('.ctrl-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const win = btn.closest('.win-window');
+          if (!win) return;
+          const act = btn.dataset.action;
+          if (act === 'min' || act === 'close') {
+            win.classList.remove('active');
+            document.querySelectorAll('.task-tab').forEach((t) => t.classList.remove('active'));
+          } else if (act === 'max') {
+            win.classList.toggle('maximized');
+          }
+        });
+      });
+
+      // Start Menu
+      const startBtn = document.getElementById('startBtn');
+      const startMenu = document.getElementById('startMenu');
+      function closeStartMenu() {
+        startMenu.classList.remove('open');
+        startBtn.classList.remove('pressed');
+      }
+      startBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = startMenu.classList.toggle('open');
+        startBtn.classList.toggle('pressed', isOpen);
+      });
+      document.addEventListener('click', (e) => {
+        if (!startMenu.contains(e.target) && e.target !== startBtn) closeStartMenu();
+      });
+
+      // Instant URL -> Demo Form on First Screen
+      const qsForm = document.getElementById('quickstartForm');
+      const qsUrl = document.getElementById('qsUrl');
+      const qsProgressWrap = document.getElementById('qsProgressWrap');
+      const qsProgressFill = document.getElementById('qsProgressFill');
+      const qsStatusText = document.getElementById('qsStatusText');
+      const qsResultBox = document.getElementById('qsResultBox');
+      const qsErrorBox = document.getElementById('qsErrorBox');
+      const qsCodeOut = document.getElementById('qsCodeOut');
+      const qsResultMeta = document.getElementById('qsResultMeta');
+      const qsPreviewLink = document.getElementById('qsPreviewLink');
+      const qsCopyBtn = document.getElementById('qsCopyBtn');
+
+      let currentSnippet = '';
+
+      qsCopyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(currentSnippet);
+          qsCopyBtn.textContent = 'Copied!';
+          setTimeout(() => { qsCopyBtn.textContent = 'Copy 1-Line Code'; }, 1600);
+        } catch (_e) {}
+      });
+
+      qsForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        qsErrorBox.style.display = 'none';
+        qsResultBox.style.display = 'none';
+        qsProgressWrap.style.display = 'block';
+        qsProgressFill.style.width = '35%';
+        qsStatusText.textContent = 'Scanning website & building your live AI assistant...';
+
+        const timer = setTimeout(() => { qsProgressFill.style.width = '78%'; }, 250);
+
+        try {
+          const res = await fetch('/api/quickstart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: qsUrl.value }),
+          });
+          const data = await res.json();
+          clearTimeout(timer);
+          if (!res.ok) throw new Error(data.error || 'Setup failed');
+
+          qsProgressWrap.style.display = 'none';
+          currentSnippet = `<script src="${origin}/widget.js" data-site-id="${data.site.id}" data-lang="en" async><\/script>`;
+          qsResultMeta.textContent = `Live AI Demo Ready for ${data.site.name}`;
+          qsCodeOut.textContent = currentSnippet;
+          qsPreviewLink.href = data.preview_url;
+          qsResultBox.style.display = 'block';
+        } catch (err) {
+          clearTimeout(timer);
+          qsProgressWrap.style.display = 'none';
+          qsErrorBox.textContent = err.message;
+          qsErrorBox.style.display = 'block';
+        }
+      });
+
+      // Pilot Form
+      const pilotForm = document.getElementById('pilotForm');
+      const pilotSuccessBox = document.getElementById('pilotSuccessBox');
+      const pilotErrorBox = document.getElementById('pilotErrorBox');
+
+      pilotForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        pilotSuccessBox.style.display = 'none';
+        pilotErrorBox.style.display = 'none';
+        try {
+          const res = await fetch('/api/leads', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: document.getElementById('leadName').value,
+              email: document.getElementById('leadEmail').value,
+              website_url: document.getElementById('leadUrl').value,
+              plan: document.getElementById('leadPlan').value,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Request failed');
+          pilotSuccessBox.textContent = `Pilot request #${data.lead.id} saved! We will send your custom preview to ${data.lead.email}.`;
+          pilotSuccessBox.style.display = 'block';
+          pilotForm.reset();
+        } catch (err) {
+          pilotErrorBox.textContent = err.message;
+          pilotErrorBox.style.display = 'block';
+        }
+      });
+    })();
+  </script>
+
+  <!-- Live Win98 AI Concierge Widget -->
+  <script src="/widget.js" data-site-id="site_dental_demo" data-lang="en" data-theme="win98" async></script>
 </body>
 </html>

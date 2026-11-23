@@ -17,6 +17,7 @@ const COMMERCIAL_KEYWORDS = [
   'цена', 'стоит', 'стоимость', 'прайс', 'сколько', 'грн', 'евро', '$', '€', 'uah', '₴', 'eur', 'pln',
   'скидк', 'акци', 'налич', 'остаток', 'купить', 'заказ', 'оформ', 'доставк', 'товар', 'услуг',
   'price', 'cost', 'how much', 'discount', 'stock', 'available', 'buy', 'order',
+  'veneer', 'implant', 'botox', 'filler', 'morpheus', 'invisalign', 'book', 'consult', 'appointment', 'financing', 'pricing', 'treatment', 'package',
   'ціна', 'скільки', 'знижк', 'наявн', 'купити', 'замов',
 ];
 
@@ -103,8 +104,15 @@ function matchProducts(products, query) {
   return matched.slice(0, 5).map((m) => m.product);
 }
 
-function formatPriceLine(p) {
+function formatPriceLine(p, lang = 'ru') {
   const cur = p.currency || '€';
+  if (lang === 'en') {
+    const fmt = (val) => (cur === '$' ? `$${Number(val).toLocaleString('en-US')}` : `${Number(val).toLocaleString('en-US')} ${cur}`);
+    const priceStr = fmt(p.price);
+    const oldStr = p.old_price ? ` (was ${fmt(p.old_price)})` : '';
+    const stockStr = Number(p.stock) > 0 ? `available slots: ${p.stock}` : 'currently unavailable';
+    return `• **${p.name}** (${p.sku}) — **${priceStr}**${oldStr} · ${stockStr}`;
+  }
   const priceStr = `${Number(p.price).toLocaleString('ru-RU')} ${cur}`;
   const oldStr = p.old_price ? ` (было ${Number(p.old_price).toLocaleString('ru-RU')} ${cur})` : '';
   const stockStr = Number(p.stock) > 0 ? `в наличии: ${p.stock} шт.` : 'нет в наличии';
@@ -316,7 +324,7 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
   if (matchedProducts.length > 0) {
     parts.push(msg.livePrefix);
     for (const p of matchedProducts) {
-      parts.push(formatPriceLine(p));
+      parts.push(formatPriceLine(p, lang));
       if (p.url) {
         sources.push({ title: `${p.name} (${p.sku})`, url: p.url, type: 'live-api' });
       }
@@ -324,18 +332,22 @@ async function handleChat({ site, query, dialogId, visitorId, language, channel 
     if (sources.filter((s) => s.type === 'live-api').length === 0) {
       sources.push({ title: liveResult.sourceLabel, type: 'live-api' });
     }
-    if (/заказ|оформ|купить|order|buy|замов|запис/i.test(cleanQuery)) {
+    if (/заказ|оформ|купить|order|buy|book|consult|appointment|замов|запис/i.test(cleanQuery)) {
       const inStockItem = matchedProducts.find((p) => Number(p.stock) > 0);
       parts.push(inStockItem ? msg.orderReady : msg.orderOutOfStock);
       if (inStockItem) {
+        const cur = inStockItem.currency || '€';
+        const priceFmt = cur === '$' ? `$${inStockItem.price}` : `${inStockItem.price} ${cur}`;
         actionProposal = {
           type: 'create_order',
-          label: `Подтвердить заказ: ${inStockItem.name} (${inStockItem.price} ${inStockItem.currency || '€'})`,
+          label: lang === 'en'
+            ? `Confirm Booking: ${inStockItem.name} (${priceFmt})`
+            : `Подтвердить заказ: ${inStockItem.name} (${inStockItem.price} ${cur})`,
           product_id: inStockItem.id,
           sku: inStockItem.sku,
           name: inStockItem.name,
           price: inStockItem.price,
-          currency: inStockItem.currency || '€',
+          currency: cur,
         };
       }
     }

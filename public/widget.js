@@ -9,6 +9,7 @@
   const overrideLang = scriptEl.getAttribute('data-lang');
   const overridePos = scriptEl.getAttribute('data-position');
   const overrideColor = scriptEl.getAttribute('data-color');
+  const overrideTheme = (scriptEl.getAttribute('data-theme') || '').toLowerCase();
 
   const visitorKey = `sitemind_vis_${siteId}`;
   const dialogKey = `sitemind_dlg_${siteId}`;
@@ -56,11 +57,18 @@
     const avatar = (cfg.widget_avatar || '').trim();
     const pos = overridePos || cfg.widget_position || 'bottom-right';
     const lang = overrideLang || cfg.language || 'ru';
+    const isWin98 = overrideTheme === 'win98';
     const isLeft = pos === 'bottom-left';
+    const isEn = lang === 'en';
 
-    const panelRadius = shape === 'sharp' ? '6px' : shape === 'pill' ? '24px' : '16px';
-    const btnRadius = shape === 'sharp' ? '10px' : '9999px';
-    const msgRadius = shape === 'sharp' ? '6px' : shape === 'pill' ? '18px' : '12px';
+    const panelRadius = isWin98 ? '0px' : (shape === 'sharp' ? '6px' : shape === 'pill' ? '24px' : '16px');
+    const btnRadius = isWin98 ? '0px' : (shape === 'sharp' ? '10px' : '9999px');
+    const msgRadius = isWin98 ? '0px' : (shape === 'sharp' ? '6px' : shape === 'pill' ? '18px' : '12px');
+
+    const subtitleText = isEn ? 'Verified 24/7 AI Concierge · Online' : 'Проверенные данные · Live API';
+    const placeholderText = isEn ? 'Ask about treatments, prices, or booking...' : 'Спросите о товаре, цене, доставке...';
+    const closeLabel = isEn ? 'Close' : 'Закрыть';
+    const toggleLabel = isEn ? 'Open AI Concierge chat' : 'Открыть чат с AI-консультантом';
 
     function renderAvatarHtml(sizePx) {
       if (avatar && (/^https?:\/\//i.test(avatar) || avatar.startsWith('data:image/'))) {
@@ -74,61 +82,76 @@
 
     shadow.innerHTML = `
       <style>
-        :host { all: initial; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        :host { all: initial; font-family: ${isWin98 ? "'Tahoma', 'MS Sans Serif', 'Segoe UI', sans-serif" : "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"}; }
         .sm-wrap {
           position: fixed;
-          bottom: 20px;
+          bottom: ${isWin98 ? '48px' : '20px'};
           ${isLeft ? 'left: 20px;' : 'right: 20px;'}
           z-index: 2147483000;
           display: flex;
           flex-direction: column;
           align-items: ${isLeft ? 'flex-start' : 'flex-end'};
-          gap: 12px;
+          gap: 10px;
         }
         .sm-btn {
+          ${isWin98 ? `
+          height: 40px;
+          padding: 0 14px;
+          border-radius: 0;
+          background: #c0c0c0;
+          color: #000000;
+          border: 2px solid;
+          border-color: #ffffff #000000 #000000 #ffffff;
+          box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 3px 3px 0 rgba(0,0,0,0.35);
+          font-weight: 700;
+          font-size: 12px;
+          gap: 8px;
+          ` : `
           width: 56px;
           height: 56px;
           border-radius: ${btnRadius};
           border: none;
           background: ${color};
           color: #ffffff;
-          cursor: pointer;
           box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.45);
+          `}
+          cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          transition: transform 0.15s ease, box-shadow 0.15s ease;
+          transition: transform 0.12s ease, box-shadow 0.12s ease;
         }
         .sm-btn:hover { transform: translateY(-2px); }
+        ${isWin98 ? `.sm-btn:active { border-color: #000000 #ffffff #ffffff #000000; box-shadow: inset 1px 1px 0 #808080; transform: translate(1px, 1px); }` : ''}
         .sm-panel {
           width: 380px;
           max-width: calc(100vw - 24px);
-          height: 520px;
-          max-height: calc(100vh - 100px);
-          background: ${bg};
-          border: 1px solid #e2e8f0;
+          height: 500px;
+          max-height: calc(100vh - 120px);
+          background: ${isWin98 ? '#c0c0c0' : bg};
+          border: ${isWin98 ? '2px solid' : '1px solid #e2e8f0'};
+          ${isWin98 ? 'border-color: #ffffff #000000 #000000 #ffffff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080, 4px 4px 0 rgba(0,0,0,0.4); padding: 3px;' : 'box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18);'}
           border-radius: ${panelRadius};
-          box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.18);
           display: none;
           flex-direction: column;
           overflow: hidden;
         }
         .sm-panel.open { display: flex; }
         .sm-head {
-          background: ${bg};
-          border-bottom: 1px solid #e2e8f0;
-          padding: 14px 16px;
+          background: ${isWin98 ? 'linear-gradient(90deg, #000080, #1084d0)' : bg};
+          border-bottom: ${isWin98 ? '2px solid #c0c0c0' : '1px solid #e2e8f0'};
+          padding: ${isWin98 ? '5px 8px' : '14px 16px'};
           display: flex;
           align-items: center;
           justify-content: space-between;
         }
-        .sm-title-wrap { display: flex; align-items: center; gap: 10px; }
+        .sm-title-wrap { display: flex; align-items: center; gap: 8px; }
         .sm-avatar {
-          width: 32px;
-          height: 32px;
-          border-radius: 9999px;
-          background: ${color};
+          width: ${isWin98 ? '22px' : '32px'};
+          height: ${isWin98 ? '22px' : '32px'};
+          border-radius: ${isWin98 ? '0px' : '9999px'};
+          background: ${isWin98 ? '#008080' : color};
           color: #ffffff;
           display: flex;
           align-items: center;
@@ -136,52 +159,50 @@
           overflow: hidden;
           flex-shrink: 0;
         }
-        .sm-dot { width: 8px; height: 8px; border-radius: 9999px; background: #10b981; display: inline-block; margin-right: 4px; }
-        .sm-title { font-weight: 700; font-size: 14px; color: #0f172a; }
-        .sm-sub { font-size: 11px; color: #64748b; display: flex; align-items: center; }
+        .sm-dot { width: 8px; height: 8px; border-radius: ${isWin98 ? '0' : '9999px'}; background: #10b981; display: inline-block; margin-right: 4px; }
+        .sm-title { font-weight: 700; font-size: ${isWin98 ? '12px' : '14px'}; color: ${isWin98 ? '#ffffff' : '#0f172a'}; }
+        .sm-sub { font-size: 10px; color: ${isWin98 ? '#dbeafe' : '#64748b'}; display: flex; align-items: center; }
         .sm-close {
-          background: transparent;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          width: 28px;
-          height: 28px;
+          background: ${isWin98 ? '#c0c0c0' : 'transparent'};
+          border: ${isWin98 ? '1px solid' : '1px solid #e2e8f0'};
+          ${isWin98 ? 'border-color: #ffffff #000000 #000000 #ffffff; box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080; width: 16px; height: 14px; color: #000000; display: inline-flex; align-items: center; justify-content: center;' : 'border-radius: 8px; width: 28px; height: 28px; color: #64748b; font-size: 16px;'}
           cursor: pointer;
-          color: #64748b;
-          font-size: 16px;
           line-height: 1;
+          padding: 0;
         }
         .sm-msgs {
           flex: 1;
           overflow-y: auto;
-          padding: 14px;
-          background: #f8fafc;
+          padding: 12px;
+          background: ${isWin98 ? '#ffffff' : '#f8fafc'};
+          ${isWin98 ? 'border: 2px solid; border-color: #808080 #ffffff #ffffff #808080; box-shadow: inset 1px 1px 0 #000000; margin: 4px 2px;' : ''}
           display: flex;
           flex-direction: column;
           gap: 10px;
         }
         .sm-msg {
           max-width: 86%;
-          padding: 10px 12px;
+          padding: 9px 11px;
           border-radius: ${msgRadius};
-          font-size: 13px;
+          font-size: ${isWin98 ? '12px' : '13px'};
           line-height: 1.45;
           word-wrap: break-word;
         }
         .sm-msg.bot {
           align-self: flex-start;
-          background: ${bg};
-          border: 1px solid #e2e8f0;
+          background: ${isWin98 ? '#f0f0f0' : bg};
+          border: 1px solid ${isWin98 ? '#808080' : '#e2e8f0'};
           color: #0f172a;
         }
         .sm-msg.user {
           align-self: flex-end;
-          background: ${color};
+          background: ${isWin98 ? '#000080' : color};
           color: #ffffff;
         }
         .sm-sources {
           margin-top: 8px;
           padding-top: 6px;
-          border-top: 1px solid #f1f5f9;
+          border-top: 1px solid ${isWin98 ? '#c0c0c0' : '#f1f5f9'};
           display: flex;
           flex-wrap: wrap;
           gap: 4px;
@@ -190,43 +211,54 @@
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 10px;
           padding: 2px 6px;
-          border-radius: 6px;
-          background: #f0f9ff;
-          border: 1px solid #bae6fd;
-          color: #0369a1;
+          border-radius: ${isWin98 ? '0' : '6px'};
+          background: ${isWin98 ? '#dfdfdf' : '#f0f9ff'};
+          border: 1px solid ${isWin98 ? '#808080' : '#bae6fd'};
+          color: ${isWin98 ? '#000080' : '#0369a1'};
           text-decoration: none;
         }
         .sm-meta {
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 10px;
-          color: #94a3b8;
+          color: #64748b;
           margin-top: 4px;
         }
         .sm-form {
           display: flex;
-          gap: 8px;
-          padding: 10px 12px;
-          background: ${bg};
-          border-top: 1px solid #e2e8f0;
+          gap: 6px;
+          padding: ${isWin98 ? '6px 2px 4px' : '10px 12px'};
+          background: ${isWin98 ? '#c0c0c0' : bg};
+          border-top: ${isWin98 ? 'none' : '1px solid #e2e8f0'};
         }
         .sm-input {
           flex: 1;
-          border: 1px solid #cbd5e1;
-          border-radius: 10px;
-          padding: 8px 12px;
-          font-size: 13px;
+          border: ${isWin98 ? '2px solid' : '1px solid #cbd5e1'};
+          ${isWin98 ? 'border-color: #808080 #ffffff #ffffff #808080; box-shadow: inset 1px 1px 0 #000000; border-radius: 0; font-size: 12px;' : 'border-radius: 10px; font-size: 13px;'}
+          padding: 7px 10px;
           outline: none;
           color: #0f172a;
+          background: #ffffff;
         }
-        .sm-input:focus { border-color: ${color}; }
+        ${isWin98 ? '' : `.sm-input:focus { border-color: ${color}; }`}
         .sm-send {
+          ${isWin98 ? `
+          border: 2px solid;
+          border-color: #ffffff #000000 #000000 #ffffff;
+          box-shadow: inset 1px 1px 0 #dfdfdf, inset -1px -1px 0 #808080;
+          border-radius: 0;
+          background: #c0c0c0;
+          color: #000000;
+          padding: 0 12px;
+          font-size: 12px;
+          ` : `
           border: none;
           border-radius: 10px;
           background: ${color};
           color: #ffffff;
           padding: 0 14px;
-          font-weight: 600;
           font-size: 13px;
+          `}
+          font-weight: 700;
           cursor: pointer;
         }
         .sm-send:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -235,24 +267,24 @@
         <div class="sm-panel" id="smPanel" role="dialog" aria-label="AI Consultant">
           <div class="sm-head">
             <div class="sm-title-wrap">
-              <div class="sm-avatar">${renderAvatarHtml(32)}</div>
+              <div class="sm-avatar">${renderAvatarHtml(isWin98 ? 18 : 32)}</div>
               <div>
                 <div class="sm-title">${escapeHtml(cfg.widget_title)}</div>
-                <div class="sm-sub"><span class="sm-dot"></span>Проверенные данные · Live API</div>
+                <div class="sm-sub"><span class="sm-dot"></span>${subtitleText}</div>
               </div>
             </div>
-            <button class="sm-close" id="smClose" aria-label="Закрыть">×</button>
+            <button class="sm-close" id="smClose" aria-label="${closeLabel}">${isWin98 ? '<svg width="8" height="7" viewBox="0 0 8 7" shape-rendering="crispEdges"><path fill="#000" d="M0 0h2v1h1v1h2V1h1V0h2v1H7v1H6v1H5v1h1v1h1v1h1v1H6V6H5V5H3v1H2v1H0V6h1V5h1V4h1V3H2V2H1V1H0V0z"/></svg>' : '×'}</button>
           </div>
           <div class="sm-msgs" id="smMsgs">
             <div class="sm-msg bot">${formatRichText(cfg.widget_welcome)}</div>
           </div>
           <form class="sm-form" id="smForm">
-            <input class="sm-input" id="smInput" type="text" placeholder="${lang === 'en' ? 'Ask about products, prices...' : 'Спросите о товаре, цене, доставке...'}" autocomplete="off" />
-            <button class="sm-send" id="smSend" type="submit">→</button>
+            <input class="sm-input" id="smInput" type="text" placeholder="${placeholderText}" autocomplete="off" />
+            <button class="sm-send" id="smSend" type="submit">${isWin98 ? 'Send' : '→'}</button>
           </form>
         </div>
-        <button class="sm-btn" id="smToggle" aria-label="Открыть чат с AI-консультантом">
-          ${renderAvatarHtml(34)}
+        <button class="sm-btn" id="smToggle" aria-label="${toggleLabel}">
+          ${isWin98 ? `<span style="width:8px;height:8px;background:#10b981;display:inline-block;border:1px solid #000;"></span><span>${escapeHtml(cfg.widget_title)} (Online)</span>` : renderAvatarHtml(34)}
         </button>
       </div>
     `;
@@ -319,7 +351,7 @@
         });
         const data = await res.json();
         if (!res.ok) {
-          appendMessage('bot', data.error || 'Ошибка сервиса');
+          appendMessage('bot', data.error || (isEn ? 'Service error' : 'Ошибка сервиса'));
         } else {
           if (data.dialog_id) {
             dialogId = data.dialog_id;
@@ -328,7 +360,7 @@
           appendMessage('bot', data.answer, data);
         }
       } catch (_err) {
-        appendMessage('bot', 'Не удалось связаться с сервером консультанта.');
+        appendMessage('bot', isEn ? 'Unable to reach the AI Concierge server.' : 'Не удалось связаться с сервером консультанта.');
       } finally {
         sendBtn.disabled = false;
         input.focus();

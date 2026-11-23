@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lumiere MedSpa Midtown NYC — Live AI Concierge &amp; Smart Search Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-stone-50 text-slate-900 antialiased min-h-screen">
+
+  <!-- Demo Banner -->
+  <div class="bg-[#000080] text-white text-xs py-2 px-4 flex flex-wrap items-center justify-between gap-2">
+    <div>
+      <strong>SiteMind AI Live Demo:</strong> 1-Line Embed (<code class="bg-black/30 px-1.5 py-0.5 rounded">&lt;script src="/widget.js" data-site-id="site_medspa_demo"&gt;</code>) + Smart Semantic Search
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/demo-dental.html" class="underline hover:text-sky-200">Switch to Dental Demo</a>
+      <a href="/" class="bg-[#c0c0c0] text-black font-bold px-2.5 py-0.5 border border-white shadow-sm">← Back to SiteMind 98</a>
+    </div>
+  </div>
+
+  <!-- MedSpa Header -->
+  <header class="bg-white border-b border-stone-200">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <div class="text-xl font-bold tracking-tight text-slate-900">Lumiere <span class="text-teal-700">MedSpa NYC</span></div>
+        <div class="text-xs text-slate-500">Midtown Manhattan · Morpheus8 · Botox · Lip Fillers · PDO Threads</div>
+      </div>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 border border-teal-200 font-semibold">● Open Until 8 PM · 24/7 AI Booking</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-10 space-y-8">
+    <!-- Hero + Smart AI Search -->
+    <section class="bg-white border border-stone-200 rounded-2xl p-6 md:p-8 shadow-sm space-y-5">
+      <div class="max-w-3xl">
+        <span class="text-xs font-semibold uppercase tracking-wider text-teal-700">Interactive MedSpa Showcase</span>
+        <h1 class="text-3xl font-extrabold text-slate-900 mt-1">Physician-Led Aesthetics in Midtown NYC — Booked 24/7</h1>
+        <p class="text-slate-600 text-sm mt-2">
+          Try the <strong>Smart AI Site Search</strong> below or open the floating <strong>AI Concierge</strong> at the bottom-right corner to ask about <em>Morpheus8 downtime</em>, <em>Botox per unit</em>, or <em>combining treatments</em>.
+        </p>
+      </div>
+
+      <form id="smartSearchForm" class="flex flex-col sm:flex-row gap-2.5">
+        <input id="smartSearchInput" type="text" placeholder="Search Morpheus8 downtime, Botox pricing, fillers, evening hours..." class="flex-1 rounded-xl border border-stone-300 px-4 py-2.5 text-sm focus:outline-none focus:border-teal-700" />
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold">AI Smart Search</button>
+      </form>
+
+      <div class="flex flex-wrap gap-2 text-xs">
+        <span class="text-slate-500 py-1">Try asking:</span>
+        <button type="button" class="quick-q px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-teal-50 border border-stone-200 text-slate-700">What is the downtime for Morpheus8?</button>
+        <button type="button" class="quick-q px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-teal-50 border border-stone-200 text-slate-700">Can I combine Botox and Morpheus8?</button>
+        <button type="button" class="quick-q px-2.5 py-1 rounded-lg bg-stone-100 hover:bg-teal-50 border border-stone-200 text-slate-700">Evening hours and deposit policy</button>
+      </div>
+
+      <div id="searchResults" class="hidden space-y-2.5 pt-2 border-t border-stone-100"></div>
+    </section>
+
+    <!-- Live Treatments -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-slate-900">Verified MedSpa Treatments &amp; Rates</h2>
+        <span class="text-xs text-slate-500">Synced live from studio catalog API</span>
+      </div>
+      <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const SITE_ID = 'site_medspa_demo';
+      const searchForm = document.getElementById('smartSearchForm');
+      const searchInput = document.getElementById('smartSearchInput');
+      const searchResults = document.getElementById('searchResults');
+      const productsGrid = document.getElementById('productsGrid');
+
+      function esc(s) {
+        return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      async function loadProducts() {
+        try {
+          const res = await fetch(`/api/sites/${SITE_ID}/products`);
+          const data = await res.json();
+          productsGrid.innerHTML = (data.products || []).map((p) => `
+            <div class="bg-white border border-stone-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="text-[11px] font-mono text-slate-400">${esc(p.sku)} · ${esc(p.category)}</div>
+                <h3 class="font-bold text-slate-900 mt-1">${esc(p.name)}</h3>
+                <p class="text-xs text-slate-600 mt-1">${esc(p.description)}</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-stone-100 flex items-baseline justify-between">
+                <span class="text-lg font-extrabold text-teal-700">$${Number(p.price).toLocaleString('en-US')}</span>
+                ${p.old_price ? `<span class="text-xs text-slate-400 line-through">$${Number(p.old_price).toLocaleString('en-US')}</span>` : ''}
+              </div>
+            </div>
+          `).join('');
+        } catch (_e) {}
+      }
+
+      async function runSearch(query) {
+        if (!query.trim()) return;
+        searchResults.classList.remove('hidden');
+        searchResults.innerHTML = '<div class="text-xs text-slate-500">Searching clinic knowledge base...</div>';
+        try {
+          const res = await fetch(`/api/sites/${SITE_ID}/knowledge/search`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query }),
+          });
+          const data = await res.json();
+          const hits = data.results || [];
+          if (hits.length === 0) {
+            searchResults.innerHTML = '<div class="text-sm text-slate-600">No exact match found. Ask our 24/7 AI Concierge in the bottom-right chat!</div>';
+            return;
+          }
+          searchResults.innerHTML = hits.map((h) => `
+            <div class="p-3.5 rounded-xl bg-teal-50/70 border border-teal-200">
+              <div class="flex items-center justify-between gap-2 mb-1">
+                <span class="text-xs font-bold text-teal-900">${esc(h.title)}</span>
+                <span class="text-[11px] font-mono text-teal-700">relevance ${(Number(h.score || 0) * 100).toFixed(0)}%</span>
+              </div>
+              <p class="text-xs text-slate-700 leading-relaxed">${esc(h.content)}</p>
+            </div>
+          `).join('');
+        } catch (_e) {
+          searchResults.innerHTML = '<div class="text-xs text-red-600">Search temporarily unavailable.</div>';
+        }
+      }
+
+      searchForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        runSearch(searchInput.value);
+      });
+
+      document.querySelectorAll('.quick-q').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          searchInput.value = btn.textContent;
+          runSearch(btn.textContent);
+        });
+      });
+
+      loadProducts();
+    })();
+  </script>
+
+  <script src="/widget.js" data-site-id="site_medspa_demo" data-lang="en" async></script>
+</body>
+</html>

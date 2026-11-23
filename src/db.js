@@ -151,6 +151,16 @@ db.exec(`
     password_hash TEXT NOT NULL,
     created_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS leads (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    website_url TEXT DEFAULT '',
+    plan TEXT DEFAULT 'pilot',
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now'))
+  );
 `);
 
 // Safe migrations for existing DBs

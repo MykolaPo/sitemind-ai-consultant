@@ -8,10 +8,11 @@ const pdfParse = require('pdf-parse');
 const { db, genId } = require('./db');
 const { indexDocumentChunks, searchKnowledge } = require('./rag');
 const { handleChat } = require('./agent');
-const { seedIfEmpty } = require('./seed');
+const { seedIfEmpty, seedShowcaseClinics } = require('./seed');
 const { crawlAndIndexSite, syncAllUrlDocs } = require('./crawler');
 
 seedIfEmpty();
+seedShowcaseClinics();
 
 const app = express();
 const PORT = Number(process.env.PORT || 3080);
@@ -52,10 +53,13 @@ function getSiteOr404(siteId, res) {
   return site;
 }
 
-// Healthcheck & favicon
+// Healthcheck & favicon & dashboard route
 app.get('/favicon.ico', (_req, res) => res.status(204).end());
 app.get(['/health', '/api/health'], (_req, res) => {
   res.json({ status: 'ok', service: 'sitemind-ai', timestamp: new Date().toISOString() });
+});
+app.get(['/dashboard', '/dashboard/'], (_req, res) => {
+  res.sendFile('dashboard.html', { root: path.join(__dirname, '..', 'public') });
 });
 
 // Auth helpers (scrypt + HMAC-SHA256 token)
@@ -585,6 +589,100 @@ app.get('/api/sites/:siteId/analytics', (req, res) => {
     tokenBudget: site.token_budget,
     estimatedCostUsd: Number(((site.tokens_used / 1000) * 0.0004).toFixed(4)),
   });
+});
+
+function normalizeQuickstartUrl(rawUrl) {
+  let clean = String(rawUrl || '').trim();
+  if (!clean) return null;
+  if (!/^https?:\/\//i.test(clean)) {
+    clean = `https://${clean}`;
+  }
+  try {
+    const parsed = new URL(clean);
+    if (!parsed.hostname || !parsed.hostname.includes('.')) return null;
+    return parsed;
+  } catch (_e) {
+    return null;
+  }
+}
+
+// 1-Click Quickstart Setup Wizard: creates site, crawls URL (with clean baseline fallback), returns embed + preview URL
+app.post('/api/quickstart', async (req, res) => {
+  const { url, name, niche = 'clinic' } = req.body || {};
+  const parsed = normalizeQuickstartUrl(url);
+  if (!parsed) {
+    return res.status(400).json({ error: 'Please enter a valid website URL (e.g. https://yourclinic.com)' });
+  }
+
+  const domain = parsed.hostname.replace(/^www\./i, '');
+  const autoName = domain
+    .split('.')[0]
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  const siteName = String(name || '').trim() || `${autoName} (${niche === 'medspa' ? 'MedSpa' : 'Clinic'})`;
+
+  const id = genId('site');
+  const apiKey = `sm_live_${crypto.randomBytes(8).toString('hex')}`;
+  const welcome = `Hi! Welcome to ${siteName}. Ask me about services, pricing, insurance, or booking a 24/7 consultation.`;
+  const prompt = `You are the 24/7 AI Patient Concierge for ${siteName} (${domain}). Answer concisely using only verified website knowledge.`;
+
+  db.prepare(`
+    INSERT INTO sites (id, name, domain, api_key, widget_title, widget_welcome, widget_color, widget_position, language, system_prompt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(id, siteName, domain, apiKey, `${siteName} AI`, welcome, '#000080', 'bottom-right', 'en', prompt);
+
+  let crawled = [];
+  try {
+    crawled = await crawlAndIndexSite(id, parsed.href, 4);
+  } catch (_e) {
+    crawled = [];
+  }
+
+  if (crawled.length === 0) {
+    const fallbackDocId = genId('doc');
+    const fallbackText = `${siteName} (${domain}) — 24/7 AI Concierge Profile:
+Website: ${parsed.href}. Prospective patients and clients can ask questions 24/7, request transparent treatment or consultation pricing, and reserve appointments online even after office hours.`;
+    db.prepare('INSERT INTO knowledge_docs (id, site_id, title, source_type, source_url, raw_content) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(fallbackDocId, id, `${siteName} Overview`, 'txt', parsed.href, fallbackText);
+    indexDocumentChunks(id, fallbackDocId, fallbackText);
+  }
+
+  db.prepare('INSERT INTO faqs (id, site_id, question, answer, source_label) VALUES (?, ?, ?, ?, ?)')
+    .run(
+      genId('faq'),
+      id,
+      'How do I book a consultation or appointment?',
+      `You can book a consultation at ${siteName} 24/7 right here in chat — just share your preferred day, treatment interest, and contact details.`,
+      'FAQ: 24/7 Booking'
+    );
+
+  const site = sanitizeSiteForClient(db.prepare('SELECT * FROM sites WHERE id = ?').get(id));
+  res.status(201).json({
+    site,
+    crawled_pages: crawled.length,
+    embed_code: `<script src="/widget.js" data-site-id="${id}" data-lang="en" async></script>`,
+    preview_url: `/preview.html?site=${id}`,
+  });
+});
+
+// 7-Day Free Pilot / Lead capture
+app.post('/api/leads', (req, res) => {
+  const { name, email, website_url = '', plan = 'pilot', notes = '' } = req.body || {};
+  const cleanName = String(name || '').trim();
+  const cleanEmail = String(email || '').trim();
+  if (!cleanName || !cleanEmail.includes('@')) {
+    return res.status(400).json({ error: 'Valid name and work email are required' });
+  }
+  const id = genId('lead');
+  db.prepare('INSERT INTO leads (id, name, email, website_url, plan, notes) VALUES (?, ?, ?, ?, ?, ?)')
+    .run(id, cleanName, cleanEmail, String(website_url || '').trim(), String(plan || 'pilot').trim(), String(notes || '').trim());
+  const lead = db.prepare('SELECT * FROM leads WHERE id = ?').get(id);
+  res.status(201).json({ lead });
+});
+
+app.get('/api/leads', (_req, res) => {
+  const leads = db.prepare('SELECT * FROM leads ORDER BY created_at DESC LIMIT 50').all();
+  res.json({ leads });
 });
 
 if (require.main === module) {

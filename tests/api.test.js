@@ -162,3 +162,54 @@ test('FAQ direct match uses 0 tokens', async () => {
   assert.equal(chat.data.model_used, 'faq-direct');
   assert.equal(chat.data.tokens_used, 0);
 });
+
+test('English dental & medspa showcase clinics answer pricing and downtime queries', async () => {
+  const dental = await jsonReq('/api/chat', {
+    method: 'POST',
+    body: JSON.stringify({ site_id: 'site_dental_demo', message: 'How much do porcelain veneers cost?', language: 'en' }),
+  });
+  assert.equal(dental.status, 200);
+  assert.ok(dental.data.answer.includes('$1,450'));
+
+  const spa = await jsonReq('/api/chat', {
+    method: 'POST',
+    body: JSON.stringify({ site_id: 'site_medspa_demo', message: 'What is the downtime for Morpheus8?', language: 'en' }),
+  });
+  assert.equal(spa.status, 200);
+  assert.match(spa.data.answer, /24-48 hours/i);
+});
+
+test('POST /api/leads saves pilot request and GET /api/leads returns it', async () => {
+  const email = `pilot_${Date.now()}@clinic.test`;
+  const created = await jsonReq('/api/leads', {
+    method: 'POST',
+    body: JSON.stringify({ name: 'Dr. Test', email, website_url: 'https://testclinic.com', plan: '7-Day Free Pilot' }),
+  });
+  assert.equal(created.status, 201);
+  assert.equal(created.data.lead.email, email);
+
+  const list = await jsonReq('/api/leads');
+  assert.equal(list.status, 200);
+  assert.ok(list.data.leads.some((l) => l.email === email));
+});
+
+test('POST /api/quickstart provisions site, embed code, and preview URL', async () => {
+  const res = await jsonReq('/api/quickstart', {
+    method: 'POST',
+    body: JSON.stringify({ url: `${baseUrl}/demo-dental.html`, name: 'Test Quickstart Clinic', niche: 'clinic' }),
+  });
+  assert.equal(res.status, 201);
+  assert.ok(res.data.site.id);
+  assert.ok(res.data.embed_code.includes(res.data.site.id));
+  assert.equal(res.data.preview_url, `/preview.html?site=${res.data.site.id}`);
+
+  // Clean up test site
+  await jsonReq(`/api/sites/${res.data.site.id}`, { method: 'DELETE' });
+});
+
+test('Landing, dashboard, dental demo, and medspa demo HTML pages return HTTP 200', async () => {
+  for (const path of ['/', '/dashboard', '/demo-dental.html', '/demo-medspa.html']) {
+    const res = await fetch(`${baseUrl}${path}`);
+    assert.equal(res.status, 200, `Expected 200 for ${path}`);
+  }
+});
